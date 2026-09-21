@@ -1,0 +1,62 @@
+{
+  "name": "Stage B -- Easy Ring (简单环弹)",
+  "waves": [
+    {
+      "time": 1.0,
+      "enemies": [
+        {
+          "x": 200, "y": -30, "hp": 15,
+          "path": [[0.0, 200, -30], [2.0, 200, 100], [18.0, 200, 100]],
+          "emitters": [
+            {"pattern": "ring", "color": "blue", "speed": 80, "count": 12, "period": 2.0}
+          ],
+          "score": 150
+        },
+        {
+          "x": 440, "y": -30, "hp": 15,
+          "path": [[0.0, 440, -30], [2.0, 440, 100], [18.0, 440, 100]],
+          "emitters": [
+            {"pattern": "ring", "color": "yellow", "speed": 80, "count": 12, "period": 2.0, "start_t": 1.0}
+          ],
+          "score": 150
+        }
+      ]
+    },
+    {
+      "time": 22.0,
+      "enemies": [
+        {
+          "x": 320, "y": -30, "hp": 20,
+          "path": [[0.0, 320, -30], [2.0, 320, 110], [20.0, 320, 110]],
+          "emitters": [
+            {"pattern": "ring", "color": "green", "speed": 100, "count": 16,
+             "rotate_speed": 0.3, "period": 1.8}
+          ],
+          "score": 250
+        }
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "time": 45,
+      "x": 320, "y": -40, "hp": 100, "radius": 24, "label": "Easy Boss",
+      "path": [[0.0, 320, -40], [2.0, 320, 130], [15.0, 320, 130]],
+      "score": 40000,
+      "spellcards": [
+        {
+          "no": "1",
+          "name": "\u73af\u5f39\u8bd5\u7ec3",
+          "duration": 28,
+          "hp_threshold": 0.45,
+          "bonus_score": 80000,
+          "emitters": [
+            {"pattern": "ring", "color": "blue", "speed": 110, "count": 20,
+             "rotate_speed": 0.3, "period": 1.2},
+            {"pattern": "aimed", "color": "red", "speed": 140, "count": 1, "period": 0.8}
+          ]
+        }
+      ]
+    }
+  ]
+}

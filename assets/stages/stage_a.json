@@ -1,0 +1,54 @@
+{
+  "name": "Stage A -- Warm-up (热身关)",
+  "waves": [
+    {
+      "time": 1.0,
+      "enemies": [
+        {
+          "x": 320, "y": -30, "hp": 8,
+          "path": [[0.0, 320, -30], [2.0, 320, 100], [20.0, 320, 100]],
+          "emitters": [
+            {"pattern": "aimed", "color": "yellow", "speed": 70, "count": 1, "period": 1.5}
+          ],
+          "score": 80
+        }
+      ]
+    },
+    {
+      "time": 18.0,
+      "enemies": [
+        {
+          "x": 320, "y": -30, "hp": 12,
+          "path": [[0.0, 320, -30], [2.0, 320, 110], [20.0, 320, 110]],
+          "emitters": [
+            {"pattern": "fan", "color": "blue", "speed": 70, "count": 3,
+             "arc": "PI/3", "base_angle": "PI/2", "period": 1.4}
+          ],
+          "score": 120
+        }
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "time": 40,
+      "x": 320, "y": -40, "hp": 60, "radius": 20, "label": "Warm-up Boss",
+      "path": [[0.0, 320, -40], [2.0, 320, 130], [15.0, 320, 130]],
+      "score": 20000,
+      "spellcards": [
+        {
+          "no": "Practice",
+          "name": "\u6162\u6162\u5f39",
+          "duration": 25,
+          "hp_threshold": 0.5,
+          "bonus_score": 30000,
+          "emitters": [
+            {"pattern": "aimed", "color": "red", "speed": 90, "count": 1, "period": 1.0},
+            {"pattern": "fan", "color": "yellow", "speed": 70, "count": 3, "arc": "PI/4",
+             "base_angle": "aimed", "period": 1.5}
+          ]
+        }
+      ]
+    }
+  ]
+}

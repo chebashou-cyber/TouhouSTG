@@ -1,0 +1,155 @@
+{
+  "name": "Stage 2 — 弹幕风暴 (JSON)",
+  "waves": [
+    {
+      "time": 0.5,
+      "enemies": [
+        {
+          "x": 100, "y": -30, "hp": 80,
+          "path": [[0.0, 100, -30], [1.5, 100, 120], [10.0, 100, 120], [12.0, -40, 120]],
+          "emitters": [
+            {"pattern": "fan", "color": "red", "speed": 200, "count": 9,
+             "arc": "PI", "base_angle": "PI/2", "period": 0.35},
+            {"pattern": "delayed_aimed", "color": "yellow", "speed": 280, "count": 3,
+             "spread": 0.15, "split_at": 0.4, "split_count": 5, "split_speed": 160,
+             "period": 0.5}
+          ],
+          "score": 2500
+        },
+        {
+          "x": 540, "y": -30, "hp": 80,
+          "path": [[0.0, 540, -30], [1.5, 540, 120], [10.0, 540, 120], [12.0, 680, 120]],
+          "emitters": [
+            {"pattern": "fan", "color": "blue", "speed": 200, "count": 9,
+             "arc": "PI", "base_angle": "PI/2", "period": 0.35},
+            {"pattern": "delayed_ring", "color": "purple", "speed": 220, "count": 3,
+             "split_at": 0.5, "split_count": 4, "split_speed": 140, "period": 0.06}
+          ],
+          "score": 2500
+        }
+      ]
+    },
+    {
+      "time": 16.0,
+      "enemies": [
+        {
+          "x": 320, "y": -40, "hp": 200,
+          "path": [[0.0, 320, -40], [2.0, 320, 130], [16.0, 320, 130]],
+          "emitters": [
+            {"pattern": "ring", "color": "red", "speed": 200, "count": 32,
+             "rotate_speed": 0.5, "period": 0.4},
+            {"pattern": "ring", "color": "yellow", "speed": 180, "count": 32,
+             "base_angle": "PI/32", "rotate_speed": -0.5, "period": 0.4, "start_t": 0.2},
+            {"pattern": "spiral", "color": "purple", "speed": 180, "count": 2,
+             "step_angle": 0.15, "period": 0.08}
+          ],
+          "score": 6000
+        }
+      ]
+    },
+    {
+      "time": 36.0,
+      "enemies": [
+        {
+          "x": 200, "y": 100, "hp": 60,
+          "path": [[0.0, 200, 100], [3.0, 480, 100], [7.0, 480, 100]],
+          "emitters": [
+            {"pattern": "delayed_fan", "color": "red", "speed": 220, "count": 12,
+             "arc": "PI/2", "base_angle": "aimed",
+             "split_at": 0.6, "split_count": 4, "split_speed": 180, "period": 0.3}
+          ],
+          "score": 2000
+        },
+        {
+          "x": 440, "y": 140, "hp": 60,
+          "path": [[0.0, 440, 140], [3.0, 160, 140], [7.0, 160, 140]],
+          "emitters": [
+            {"pattern": "delayed_fan", "color": "purple", "speed": 220, "count": 12,
+             "arc": "PI/2", "base_angle": "aimed",
+             "split_at": 0.6, "split_count": 4, "split_speed": 180, "period": 0.3}
+          ],
+          "score": 2000
+        }
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "time": 56,
+      "x": 320, "y": -40, "hp": 600, "radius": 26, "label": "Stage 2 Mid Boss",
+      "path": [[0.0, 320, -40], [1.5, 320, 110], [12.0, 320, 110]],
+      "score": 150000,
+      "spellcards": [
+        {
+          "no": "Mid",
+          "name": "风符「螺旋之风」",
+          "duration": 24,
+          "hp_threshold": 0.45,
+          "bonus_score": 250000,
+          "emitters": [
+            {"pattern": "spiral", "color": "blue", "speed": 200, "count": 3,
+             "step_angle": 0.20, "period": 0.06},
+            {"pattern": "delayed_aimed", "color": "purple", "speed": 260, "count": 5,
+             "spread": 0.08, "split_at": 0.5, "split_count": 4, "split_speed": 160,
+             "period": 0.45}
+          ]
+        }
+      ]
+    },
+    {
+      "time": 80,
+      "x": 320, "y": -50, "hp": 1200, "radius": 32, "label": "Stage 2 Boss",
+      "path": [[0.0, 320, -50], [2.0, 320, 130], [15.0, 320, 130]],
+      "score": 300000,
+      "spellcards": [
+        {
+          "no": "1",
+          "name": "风符「烈风弹」",
+          "duration": 28,
+          "hp_threshold": 0.40,
+          "bonus_score": 400000,
+          "emitters": [
+            {"pattern": "fan", "color": "blue", "speed": 220, "count": 11,
+             "arc": "PI", "base_angle": "aimed", "period": 0.40},
+            {"pattern": "delayed_ring", "color": "yellow", "speed": 200, "count": 6,
+             "split_at": 0.5, "split_count": 4, "split_speed": 140, "period": 0.10}
+          ]
+        },
+        {
+          "no": "2",
+          "name": "风符「风刃乱舞」",
+          "duration": 30,
+          "hp_threshold": 0.50,
+          "bonus_score": 700000,
+          "emitters": [
+            {"pattern": "delayed_fan", "color": "red", "speed": 240, "count": 14,
+             "arc": "PI/3", "base_angle": "PI/2",
+             "split_at": 0.4, "split_count": 5, "split_speed": 180, "period": 0.35},
+            {"pattern": "spiral", "color": "purple", "speed": 220, "count": 2,
+             "step_angle": 0.12, "period": 0.06},
+            {"pattern": "aimed", "color": "yellow", "speed": 340, "count": 1, "period": 0.4}
+          ]
+        },
+        {
+          "no": "Final",
+          "name": "风神符「神域之风」",
+          "duration": 35,
+          "hp_threshold": 0.55,
+          "bonus_score": 1200000,
+          "emitters": [
+            {"pattern": "delayed_ring", "color": "red", "speed": 240, "count": 36,
+             "rotate_speed": 0.6, "split_at": 0.5, "split_count": 4, "split_speed": 160,
+             "period": 0.30},
+            {"pattern": "delayed_ring", "color": "yellow", "speed": 200, "count": 36,
+             "base_angle": "PI/36", "rotate_speed": -0.6,
+             "split_at": 0.5, "split_count": 4, "split_speed": 140,
+             "period": 0.30, "start_t": 0.15},
+            {"pattern": "delayed_fan", "color": "purple", "speed": 260, "count": 16,
+             "arc": "PI/3", "base_angle": "aimed",
+             "split_at": 0.4, "split_count": 5, "split_speed": 180, "period": 0.5}
+          ]
+        }
+      ]
+    }
+  ]
+}

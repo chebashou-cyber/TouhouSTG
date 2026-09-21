@@ -1,0 +1,72 @@
+{
+  "name": "Stage 6 -- Lunatic (极难)",
+  "waves": [
+    {
+      "time": 0.5,
+      "enemies": [
+        {
+          "x": 160, "y": -40, "hp": 350,
+          "path": [[0.0, 160, -40], [2.0, 160, 110], [20.0, 160, 110]],
+          "emitters": [
+            {"pattern": "delayed_ring", "color": "red", "speed": 280, "count": 40,
+             "rotate_speed": 0.7, "split_at": 0.4, "split_count": 5, "split_speed": 180, "period": 0.25},
+            {"pattern": "delayed_ring", "color": "yellow", "speed": 240, "count": 40,
+             "base_angle": "PI/40", "rotate_speed": -0.7,
+             "split_at": 0.4, "split_count": 5, "split_speed": 160, "period": 0.25, "start_t": 0.13},
+            {"pattern": "delayed_aimed", "color": "purple", "speed": 320, "count": 4,
+             "spread": 0.10, "split_at": 0.4, "split_count": 4, "split_speed": 200, "period": 0.25}
+          ],
+          "score": 8000
+        }
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "time": 25,
+      "x": 320, "y": -60, "hp": 1500, "radius": 36, "label": "Lunatic Boss",
+      "path": [[0.0, 320, -60], [2.5, 320, 140], [25.0, 320, 140]],
+      "score": 500000,
+      "spellcards": [
+        {
+          "no": "1",
+          "name": "\u6781\u7b26\u300c\u96f7\u9706\u300d",
+          "duration": 32,
+          "hp_threshold": 0.4,
+          "bonus_score": 700000,
+          "emitters": [
+            {"pattern": "delayed_ring", "color": "red", "speed": 280, "count": 48,
+             "rotate_speed": 0.8, "split_at": 0.4, "split_count": 5, "split_speed": 180, "period": 0.20},
+            {"pattern": "delayed_ring", "color": "yellow", "speed": 240, "count": 48,
+             "base_angle": "PI/48", "rotate_speed": -0.8,
+             "split_at": 0.4, "split_count": 5, "split_speed": 160, "period": 0.20, "start_t": 0.10},
+            {"pattern": "delayed_fan", "color": "purple", "speed": 280, "count": 16,
+             "arc": "PI/3", "base_angle": "aimed",
+             "split_at": 0.4, "split_count": 4, "split_speed": 180, "period": 0.35}
+          ]
+        },
+        {
+          "no": "Final",
+          "name": "\u6781\u5965\u7b26\u300c\u795e\u96e8\u300d",
+          "duration": 40,
+          "hp_threshold": 0.6,
+          "bonus_score": 2000000,
+          "emitters": [
+            {"pattern": "delayed_ring", "color": "red", "speed": 300, "count": 56,
+             "rotate_speed": 0.9, "split_at": 0.4, "split_count": 5, "split_speed": 200, "period": 0.18},
+            {"pattern": "delayed_ring", "color": "yellow", "speed": 260, "count": 56,
+             "base_angle": "PI/56", "rotate_speed": -0.9,
+             "split_at": 0.4, "split_count": 5, "split_speed": 180, "period": 0.18, "start_t": 0.09},
+            {"pattern": "delayed_ring", "color": "purple", "speed": 240, "count": 56,
+             "base_angle": "PI/28", "rotate_speed": 0.5,
+             "split_at": 0.4, "split_count": 5, "split_speed": 170, "period": 0.20, "start_t": 0.05},
+            {"pattern": "delayed_fan", "color": "blue", "speed": 320, "count": 24,
+             "arc": "2*PI/3", "base_angle": "aimed",
+             "split_at": 0.4, "split_count": 5, "split_speed": 200, "period": 0.30},
+            {"pattern": "spiral", "color": "white", "speed": 240, "count": 3, "step_angle": 0.20, "period": 0.04}
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "name": "Stage 3 — 终点 (JSON)",
+  "waves": [
+    {
+      "time": 0.5,
+      "enemies": [
+        {
+          "x": 320, "y": -30, "hp": 300,
+          "path": [[0.0, 320, -30], [2.0, 320, 130], [15.0, 320, 130]],
+          "emitters": [
+            {"pattern": "ring", "color": "red", "speed": 220, "count": 32,
+             "rotate_speed": 0.55, "period": 0.35},
+            {"pattern": "ring", "color": "yellow", "speed": 200, "count": 32,
+             "base_angle": "PI/32", "rotate_speed": -0.55,
+             "period": 0.35, "start_t": 0.18},
+            {"pattern": "delayed_aimed", "color": "purple", "speed": 280, "count": 3,
+             "spread": 0.12, "split_at": 0.5, "split_count": 5, "split_speed": 180,
+             "period": 0.4}
+          ],
+          "score": 8000
+        }
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "time": 25,
+      "x": 320, "y": -60, "hp": 1500, "radius": 36, "label": "Final Boss",
+      "path": [[0.0, 320, -60], [2.5, 320, 140], [25.0, 320, 140]],
+      "score": 500000,
+      "spellcards": [
+        {
+          "no": "1",
+          "name": "终符「星海流星」",
+          "duration": 30,
+          "hp_threshold": 0.40,
+          "bonus_score": 500000,
+          "emitters": [
+            {"pattern": "delayed_ring", "color": "red", "speed": 250, "count": 40,
+             "rotate_speed": 0.5, "split_at": 0.6, "split_count": 4,
+             "split_speed": 160, "period": 0.30},
+            {"pattern": "delayed_ring", "color": "yellow", "speed": 220, "count": 40,
+             "base_angle": "PI/40", "rotate_speed": -0.5,
+             "split_at": 0.6, "split_count": 4, "split_speed": 140,
+             "period": 0.30, "start_t": 0.15},
+            {"pattern": "delayed_fan", "color": "purple", "speed": 260, "count": 16,
+             "arc": "PI/3", "base_angle": "aimed",
+             "split_at": 0.5, "split_count": 5, "split_speed": 180, "period": 0.4}
+          ]
+        },
+        {
+          "no": "Final",
+          "name": "终奥符「星尘终焉」",
+          "duration": 40,
+          "hp_threshold": 0.60,
+          "bonus_score": 2000000,
+          "emitters": [
+            {"pattern": "delayed_ring", "color": "red", "speed": 280, "count": 48,
+             "rotate_speed": 0.7, "split_at": 0.5, "split_count": 5,
+             "split_speed": 180, "period": 0.25},
+            {"pattern": "delayed_ring", "color": "yellow", "speed": 240, "count": 48,
+             "base_angle": "PI/48", "rotate_speed": -0.7,
+             "split_at": 0.5, "split_count": 5, "split_speed": 160,
+             "period": 0.25, "start_t": 0.13},
+            {"pattern": "delayed_fan", "color": "purple", "speed": 280, "count": 20,
+             "arc": "PI/3", "base_angle": "aimed",
+             "split_at": 0.4, "split_count": 6, "split_speed": 200, "period": 0.4},
+            {"pattern": "spiral", "color": "blue", "speed": 220, "count": 3,
+             "step_angle": 0.18, "period": 0.05}
+          ]
+        }
+      ]
+    }
+  ]
+}

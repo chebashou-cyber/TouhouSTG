@@ -1,0 +1,90 @@
+{
+  "name": "Stage 5 -- Hard (高难)",
+  "waves": [
+    {
+      "time": 0.5,
+      "enemies": [
+        {
+          "x": 160, "y": -40, "hp": 200,
+          "path": [[0.0, 160, -40], [2.0, 160, 100], [16.0, 160, 100]],
+          "emitters": [
+            {"pattern": "ring", "color": "red", "speed": 200, "count": 32, "rotate_speed": 0.6, "period": 0.40},
+            {"pattern": "delayed_aimed", "color": "blue", "speed": 280, "count": 3,
+             "split_at": 0.4, "split_count": 4, "split_speed": 180, "period": 0.35}
+          ],
+          "score": 5000
+        },
+        {
+          "x": 480, "y": -40, "hp": 200,
+          "path": [[0.0, 480, -40], [2.0, 480, 100], [16.0, 480, 100]],
+          "emitters": [
+            {"pattern": "delayed_fan", "color": "purple", "speed": 240, "count": 12,
+             "arc": "PI/3", "base_angle": "PI/2",
+             "split_at": 0.5, "split_count": 4, "split_speed": 160, "period": 0.30},
+            {"pattern": "scatter", "color": "yellow", "speed": 220, "count": 8,
+             "base_angle": "aimed", "angle_jitter": "PI/3", "rng_seed": 31, "period": 0.30}
+          ],
+          "score": 5000
+        }
+      ]
+    },
+    {
+      "time": 30.0,
+      "enemies": [
+        {
+          "x": 320, "y": -40, "hp": 350,
+          "path": [[0.0, 320, -40], [2.5, 320, 130], [20.0, 320, 130]],
+          "emitters": [
+            {"pattern": "delayed_ring", "color": "red", "speed": 220, "count": 36,
+             "rotate_speed": 0.5, "split_at": 0.5, "split_count": 4, "split_speed": 160, "period": 0.20},
+            {"pattern": "delayed_ring", "color": "blue", "speed": 200, "count": 36,
+             "base_angle": "PI/36", "rotate_speed": -0.5,
+             "split_at": 0.5, "split_count": 4, "split_speed": 140, "period": 0.20, "start_t": 0.10},
+            {"pattern": "delayed_aimed", "color": "yellow", "speed": 300, "count": 5,
+             "spread": 0.12, "split_at": 0.4, "split_count": 4, "split_speed": 180, "period": 0.35}
+          ],
+          "score": 8000
+        }
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "time": 60,
+      "x": 320, "y": -50, "hp": 1000, "radius": 30, "label": "Stage 5 Boss",
+      "path": [[0.0, 320, -50], [2.0, 320, 130], [20.0, 320, 130]],
+      "score": 250000,
+      "spellcards": [
+        {
+          "no": "1",
+          "name": "\u9ad8\u7b26\u300c\u9b42\u98a8\u96e8\u300d",
+          "duration": 28,
+          "hp_threshold": 0.4,
+          "bonus_score": 500000,
+          "emitters": [
+            {"pattern": "delayed_ring", "color": "red", "speed": 240, "count": 36,
+             "rotate_speed": 0.6, "split_at": 0.5, "split_count": 4, "split_speed": 160, "period": 0.25},
+            {"pattern": "delayed_fan", "color": "purple", "speed": 260, "count": 14,
+             "arc": "PI/2", "base_angle": "aimed",
+             "split_at": 0.4, "split_count": 4, "split_speed": 170, "period": 0.30}
+          ]
+        },
+        {
+          "no": "2",
+          "name": "\u9ad8\u7b56\u300c\u96e8\u52a4\u300d",
+          "duration": 30,
+          "hp_threshold": 0.5,
+          "bonus_score": 900000,
+          "emitters": [
+            {"pattern": "delayed_ring", "color": "red", "speed": 240, "count": 40,
+             "rotate_speed": 0.7, "split_at": 0.4, "split_count": 5, "split_speed": 180, "period": 0.25},
+            {"pattern": "delayed_ring", "color": "yellow", "speed": 200, "count": 40,
+             "base_angle": "PI/40", "rotate_speed": -0.7,
+             "split_at": 0.4, "split_count": 5, "split_speed": 160, "period": 0.25, "start_t": 0.13},
+            {"pattern": "spiral", "color": "blue", "speed": 220, "count": 3, "step_angle": 0.16, "period": 0.05}
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "name": "Stage C -- Slow Spiral (慢速螺旋)",
+  "waves": [
+    {
+      "time": 1.0,
+      "enemies": [
+        {
+          "x": 200, "y": -30, "hp": 25,
+          "path": [[0.0, 200, -30], [2.0, 200, 100], [20.0, 200, 100]],
+          "emitters": [
+            {"pattern": "spiral", "color": "purple", "speed": 90, "count": 1,
+             "step_angle": 0.12, "period": 0.18}
+          ],
+          "score": 200
+        },
+        {
+          "x": 440, "y": -30, "hp": 25,
+          "path": [[0.0, 440, -30], [2.0, 440, 100], [20.0, 440, 100]],
+          "emitters": [
+            {"pattern": "aimed", "color": "yellow", "speed": 100, "count": 2,
+             "spread": 0.10, "period": 0.8}
+          ],
+          "score": 200
+        }
+      ]
+    },
+    {
+      "time": 22.0,
+      "enemies": [
+        {
+          "x": 320, "y": -30, "hp": 35,
+          "path": [[0.0, 320, -30], [2.0, 320, 110], [20.0, 320, 110]],
+          "emitters": [
+            {"pattern": "fan", "color": "blue", "speed": 110, "count": 5,
+             "arc": "PI/2", "base_angle": "PI/2", "period": 1.0}
+          ],
+          "score": 300
+        }
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "time": 48,
+      "x": 320, "y": -40, "hp": 150, "radius": 26, "label": "Spiral Boss",
+      "path": [[0.0, 320, -40], [2.0, 320, 130], [15.0, 320, 130]],
+      "score": 60000,
+      "spellcards": [
+        {
+          "no": "1",
+          "name": "\u5e26\u52b2\u87ba\u65cb",
+          "duration": 30,
+          "hp_threshold": 0.45,
+          "bonus_score": 120000,
+          "emitters": [
+            {"pattern": "spiral", "color": "purple", "speed": 130, "count": 2,
+             "step_angle": 0.14, "period": 0.10},
+            {"pattern": "fan", "color": "blue", "speed": 130, "count": 5,
+             "arc": "PI/3", "base_angle": "aimed", "period": 1.2}
+          ]
+        }
+      ]
+    }
+  ]
+}
