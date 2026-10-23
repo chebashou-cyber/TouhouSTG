@@ -1,0 +1,270 @@
+{
+  "version": 1,
+  "title": "星屑异变",
+  "characters": {
+    "rein": {
+      "name": "铃岚",
+      "title": "博丽的巫女",
+      "color": [255, 110, 130],
+      "side": "left"
+    },
+    "ruye": {
+      "name": "露叶",
+      "title": "森林的小妖精",
+      "color": [140, 235, 150],
+      "side": "right"
+    },
+    "xiaoye": {
+      "name": "小夜",
+      "title": "夜雀",
+      "color": [175, 150, 255],
+      "side": "right"
+    },
+    "binghua": {
+      "name": "冰华",
+      "title": "冰之妖精",
+      "color": [140, 215, 255],
+      "side": "right"
+    },
+    "lingyue": {
+      "name": "铃月",
+      "title": "竹林的守路人",
+      "color": [205, 235, 205],
+      "side": "right"
+    },
+    "zishu": {
+      "name": "紫书",
+      "title": "星之书库的主人",
+      "color": [220, 175, 255],
+      "side": "right"
+    },
+    "ling": {
+      "name": "机织 零",
+      "title": "计数的机关人偶",
+      "color": [195, 205, 225],
+      "side": "right"
+    },
+    "qiong": {
+      "name": "穹",
+      "title": "星之器的守护者",
+      "color": [255, 225, 160],
+      "side": "right"
+    }
+  },
+  "chapters": [
+    {
+      "id": 1,
+      "stage_id": 1,
+      "title": "一章",
+      "subtitle": "褪色的夜空",
+      "bg_tint": [14, 10, 30],
+      "prologue": [
+        { "text": "那一夜，博丽神社上空的星星少了三成。" },
+        { "speaker": "rein", "text": "……星星在掉。不是流星，是被拽下来的。" },
+        { "speaker": "ruye", "text": "铃岚！铃岚！森林那边——星星的碎片堆成山了！" },
+        { "speaker": "rein", "text": "带路。掉下来的东西，总得有人捡。" },
+        { "text": "森林深处，碎星像雪一样发着冷光。" },
+        { "speaker": "ruye", "text": "奇怪……这些光在往一个方向流。像被谁吸走了。" },
+        { "speaker": "rein", "text": "那就是有主的东西了。抢回来就是。" }
+      ],
+      "boss_intro": [
+        { "speaker": "xiaoye", "text": "呜哇——半夜闯进人家领地的巫女，真没礼貌。" },
+        { "speaker": "rein", "text": "你是夜雀吧。这些碎星，是你收的？" },
+        { "speaker": "xiaoye", "text": "收？我只是在吃。天上掉下来的，谁捡到算谁的。" },
+        { "speaker": "ruye", "text": "小夜！碎星是夜空的碎片，吃光了星星就不亮了！" },
+        { "speaker": "xiaoye", "text": "那就更该趁现在多吃几口——等它们被那东西吸干，连味道都没了。" },
+        { "speaker": "rein", "text": "「那东西」？" }
+      ],
+      "clear": [
+        { "speaker": "xiaoye", "text": "呜……好痛。算了，告诉你吧。" },
+        { "speaker": "xiaoye", "text": "碎星不是从天上掉的，是往上飞的。从雾之湖那边，一路往上。" },
+        { "speaker": "rein", "text": "往上飞。" },
+        { "speaker": "xiaoye", "text": "对。有什么东西在天上，张着嘴。" },
+        { "speaker": "ruye", "text": "铃岚，雾之湖……湖面这三天一直没化。" },
+        { "speaker": "rein", "text": "那就去湖上看看。你，跟得上吗？" },
+        { "speaker": "ruye", "text": "跟得上！我飞得快！" }
+      ]
+    },
+    {
+      "id": 2,
+      "stage_id": 2,
+      "title": "二章",
+      "subtitle": "雾湖冰晶",
+      "bg_tint": [10, 22, 40],
+      "prologue": [
+        { "text": "雾之湖结了一层不该在夏天出现的薄冰。" },
+        { "speaker": "ruye", "text": "阿嚏——！这什么天气，六月啊！" },
+        { "speaker": "rein", "text": "冰下面……有光。" },
+        { "speaker": "ruye", "text": "星星！冻在冰里的星星！好多好多！" },
+        { "speaker": "rein", "text": "有人在存。一片一片，存得整整齐齐。" },
+        { "speaker": "ruye", "text": "存星星干什么呀……" },
+        { "speaker": "rein", "text": "问她本人。" }
+      ],
+      "boss_intro": [
+        { "speaker": "binghua", "text": "不要踩。我摆了很久。" },
+        { "speaker": "rein", "text": "这些星星，是你冻起来的？" },
+        { "speaker": "binghua", "text": "冰会留住光。掉在地上的光，一夜就散了。冻住，就不会散。" },
+        { "speaker": "ruye", "text": "冰华……可是天上已经没有星星可以掉了呀。" },
+        { "speaker": "binghua", "text": "我知道。所以我把它们留在这里。" },
+        { "speaker": "rein", "text": "留着，然后呢？" },
+        { "speaker": "binghua", "text": "……然后，等它吃饱。" }
+      ],
+      "clear": [
+        { "text": "冰面裂开一道细纹，一直延伸到湖心。" },
+        { "speaker": "binghua", "text": "……冰碎了。" },
+        { "speaker": "rein", "text": "星星我不带走。冰，你自己补。" },
+        { "speaker": "binghua", "text": "往上走的话，再过一片竹林。有人在守着。" },
+        { "speaker": "ruye", "text": "守住竹林？为什么？" },
+        { "speaker": "binghua", "text": "因为竹林后面，是通到天上的路。" },
+        { "speaker": "rein", "text": "那就走那条路。" },
+        { "speaker": "binghua", "text": "巫女。天上那东西，不是你打碎一盏灯就能解决的。" }
+      ]
+    },
+    {
+      "id": 3,
+      "stage_id": 3,
+      "title": "三章",
+      "subtitle": "迷途竹林",
+      "bg_tint": [8, 26, 18],
+      "prologue": [
+        { "text": "竹林里没有风，竹叶却在响。" },
+        { "speaker": "ruye", "text": "路……在转。刚才那棵竹子，我已经见过三次了。" },
+        { "speaker": "rein", "text": "迷途竹林。它不想让我们过去。" },
+        { "speaker": "ruye", "text": "有人在这里。" },
+        { "text": "竹影分开，一支箭钉在两人脚前的地上。" },
+        { "speaker": "lingyue", "text": "回去。这条路，今晚不通。" },
+        { "speaker": "rein", "text": "谁说的？" }
+      ],
+      "boss_intro": [
+        { "speaker": "lingyue", "text": "守路人，铃月。奉命，不让任何人上台阶。" },
+        { "speaker": "rein", "text": "奉谁的命？" },
+        { "speaker": "lingyue", "text": "书库的主人。" },
+        { "speaker": "ruye", "text": "竹林的守路人，是书库的人？" },
+        { "speaker": "lingyue", "text": "她说，天上的东西饿极了。放人上去，等于往它嘴里塞点心。" },
+        { "speaker": "rein", "text": "所以你就堵着门？" },
+        { "speaker": "lingyue", "text": "对。要么你打倒我，要么你回去。" }
+      ],
+      "clear": [
+        { "speaker": "lingyue", "text": "……是我输了。" },
+        { "speaker": "rein", "text": "台阶在哪？" },
+        { "speaker": "lingyue", "text": "竹林最深处。别谢我，我是被打服的，不是被说服的。" },
+        { "speaker": "ruye", "text": "铃月，书库的主人，是个什么样的人？" },
+        { "speaker": "lingyue", "text": "一个把所有事都记在册子上，却一条也改不了的家伙。" },
+        { "speaker": "rein", "text": "记下来，然后呢。" },
+        { "speaker": "lingyue", "text": "然后看着它发生。这就是她最擅长的事。" }
+      ]
+    },
+    {
+      "id": 4,
+      "stage_id": 4,
+      "title": "四章",
+      "subtitle": "星之书库",
+      "bg_tint": [26, 14, 36],
+      "prologue": [
+        { "text": "书库的门自己开了。台阶一直往上，看不到尽头。" },
+        { "speaker": "ruye", "text": "这里的书……全是星星的记录。" },
+        { "text": "每一册的封面上，都印着某一个日期的夜空。" },
+        { "speaker": "rein", "text": "这一册是空的。" },
+        { "speaker": "ruye", "text": "不是空的，是被人借走了。" },
+        { "speaker": "rein", "text": "谁借的？" },
+        { "speaker": "zishu", "text": "我。……还有，天上那位。" }
+      ],
+      "boss_intro": [
+        { "speaker": "zishu", "text": "欢迎，博丽的巫女。你比我算的快了两天。" },
+        { "speaker": "rein", "text": "你就是书库的主人？" },
+        { "speaker": "zishu", "text": "记录者。天上那台「星之器」，最初是照着我的书造的。" },
+        { "speaker": "ruye", "text": "你的书？" },
+        { "speaker": "zishu", "text": "一册关于「收集愿望」的书。我写了它，却没想到真的有人去造。" },
+        { "speaker": "rein", "text": "造它的人是谁？" },
+        { "speaker": "zishu", "text": "在更高的地方。一个不肯睡觉的机关。" }
+      ],
+      "clear": [
+        { "speaker": "zishu", "text": "书我还你。……不，书我烧了。" },
+        { "speaker": "rein", "text": "烧了？" },
+        { "speaker": "zishu", "text": "记下来救不了任何人。至少这一次，让我把它忘掉。" },
+        { "speaker": "ruye", "text": "那星星呢？烧掉书，星星会回来吗？" },
+        { "speaker": "zishu", "text": "不会。星之器已经把三成的夜空装进去了。" },
+        { "speaker": "rein", "text": "那就把装进去的，倒出来。" },
+        { "speaker": "zishu", "text": "……天守阁。机织零在那里。" }
+      ]
+    },
+    {
+      "id": 5,
+      "stage_id": 5,
+      "title": "五章",
+      "subtitle": "机关天守",
+      "bg_tint": [30, 18, 12],
+      "prologue": [
+        { "text": "天守阁的齿轮在夜里转，一格一格，像某种计数。" },
+        { "speaker": "ruye", "text": "好吵……整座楼都在动。" },
+        { "speaker": "rein", "text": "它在数。" },
+        { "speaker": "ruye", "text": "数星星？" },
+        { "speaker": "rein", "text": "数还差多少。" },
+        { "text": "走廊尽头，一个影子立在窗边，正对着空掉的那片夜空。" }
+      ],
+      "boss_intro": [
+        { "speaker": "ling", "text": "……三成零七。还差六成九十三。" },
+        { "speaker": "rein", "text": "机织零。" },
+        { "speaker": "ling", "text": "记录：巫女一人，妖精一人，到达时刻——比预定早了两天。" },
+        { "speaker": "ruye", "text": "它也在记。" },
+        { "speaker": "ling", "text": "我不是「它」。我是被造来数星星的。" },
+        { "speaker": "rein", "text": "数完了要做什么？" },
+        { "speaker": "ling", "text": "交给穹。然后，让它许愿。" }
+      ],
+      "clear": [
+        { "speaker": "ling", "text": "计数……中断。" },
+        { "speaker": "rein", "text": "你数了两百年？" },
+        { "speaker": "ling", "text": "三百六十一年四个月零九天。……第一次，有人打断我。" },
+        { "speaker": "ruye", "text": "零，你的愿望是什么？" },
+        { "speaker": "ling", "text": "我没有愿望。我只是被造来收集愿望的。" },
+        { "speaker": "rein", "text": "那这次，你自己上去看看。" },
+        { "speaker": "ling", "text": "……星之器在最上层。穹会等你。" }
+      ]
+    },
+    {
+      "id": 6,
+      "stage_id": 6,
+      "title": "终章",
+      "subtitle": "星之器",
+      "bg_tint": [30, 20, 8],
+      "prologue": [
+        { "text": "最上层没有屋顶。夜空就在这里，却像被撕开了一道口子。" },
+        { "speaker": "ruye", "text": "星星……都在往下掉。" },
+        { "speaker": "rein", "text": "不。是被吸上去。" },
+        { "text": "装置中央，一团光在缓缓旋转，四周是成千上万已经熄灭的星。" },
+        { "speaker": "qiong", "text": "欢迎。你是第七个上来的。" },
+        { "speaker": "rein", "text": "前面六个呢？" },
+        { "speaker": "qiong", "text": "都在这里。他们的愿望，变成了光。" }
+      ],
+      "boss_intro": [
+        { "speaker": "qiong", "text": "星之器，收集愿望，也收集光。愿望越多，它就越饿。" },
+        { "speaker": "rein", "text": "所以你就一直喂？" },
+        { "speaker": "qiong", "text": "不是我在喂。是这座小小的幻想，每个人都在往天上许愿。" },
+        { "speaker": "ruye", "text": "可是……夜空被吃掉了呀！" },
+        { "speaker": "qiong", "text": "愿望需要燃料。夜空就是燃料。这是一笔公平的交易。" },
+        { "speaker": "rein", "text": "公平？拿走所有人的星星，换几个人的愿望？" },
+        { "speaker": "qiong", "text": "那就打倒我。让我看看，你的愿望比星空更重吗。" }
+      ],
+      "clear": [
+        { "speaker": "qiong", "text": "……原来如此。" },
+        { "speaker": "rein", "text": "星之器，我砸了。" },
+        { "speaker": "qiong", "text": "砸了，愿望还会再长出来。下一次，它还会饿。" },
+        { "speaker": "rein", "text": "那就下次再砸。" },
+        { "speaker": "ruye", "text": "穹，你也一起看星星吧？反正现在有得看了。" },
+        { "speaker": "qiong", "text": "……我已经很久没有抬头了。" },
+        { "text": "那道口子，慢慢地合上了。" }
+      ]
+    }
+  ],
+  "ending": [
+    { "text": "那天之后，博丽神社上空的星星，一颗一颗回来了。" },
+    { "speaker": "ruye", "text": "铃岚！你看！北斗七星，七颗都在！" },
+    { "speaker": "rein", "text": "嗯。" },
+    { "speaker": "ruye", "text": "不过……好像比原来多了一颗？" },
+    { "speaker": "rein", "text": "那是碎星。小夜吃剩下的。" },
+    { "speaker": "ruye", "text": "诶——那它会不会又掉下来呀？" },
+    { "speaker": "rein", "text": "掉下来就再捡。反正有人愿意跟我一起飞。" },
+    { "speaker": "ruye", "text": "嘿嘿。那——下一个异变，也带上我！" },
+    { "text": "星屑异变，至此解决。" }
+  ]
+}

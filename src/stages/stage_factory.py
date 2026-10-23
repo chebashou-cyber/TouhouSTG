@@ -1,27 +1,51 @@
 # -*- coding: utf-8 -*-
 """stage_factory.py — 关卡工厂
 
-make_stage(stage_id, json_path=None) -> Stage1 (或其他 stage 类)
+关卡表 (stage_id -> JSON 文件):
+  0        教学关
+  1..6     剧情模式六章 (ch1..ch6), 也可以单关练习
+  7..9     EX 追加关 (旧版的 stage2 / stage4 / stage5)
+
+make_stage(stage_id) -> Stage
 """
 from __future__ import annotations
 import os
+
 from src.stages.stage1 import Stage1
 from src.stages.loader import load_stage, build_waves, build_bosses
 
-
-# stage_id -> file name mapping (intro stages use letter suffix to keep order)
+# stage_id -> 文件名 (不含 .json)
 STAGE_FILE_MAP = {
-    0: "stage0",    # tutorial
-    1: "stage_a",  # warm-up (easy)
-    2: "stage_b",  # easy ring
-    3: "stage_c",  # slow spiral
-    4: "stage1",   # original 1 (medium)
-    5: "stage2",
-    6: "stage3",
-    7: "stage4",
-    8: "stage5",
-    9: "stage6",
+    0: "stage0",   # 教学
+    1: "ch1",      # 一章 夜雀之森
+    2: "ch2",      # 二章 雾湖冰晶
+    3: "ch3",      # 三章 迷途竹林
+    4: "ch4",      # 四章 星之书库
+    5: "ch5",      # 五章 机关天守
+    6: "ch6",      # 终章 星之器
+    7: "stage2",   # EX 弹幕风暴
+    8: "stage4",   # EX 中阶
+    9: "stage5",   # EX 高难
 }
+
+# 关卡显示名 (菜单 / Stage Clear / 结算用)
+STAGE_LABELS = {
+    0: "序 · 教程",
+    1: "一章 · 夜雀之森",
+    2: "二章 · 雾湖冰晶",
+    3: "三章 · 迷途竹林",
+    4: "四章 · 星之书库",
+    5: "五章 · 机关天守",
+    6: "终章 · 星之器",
+    7: "EX1 · 弹幕风暴",
+    8: "EX2 · 中阶",
+    9: "EX3 · 高难",
+}
+
+MAX_STAGE = max(STAGE_FILE_MAP)
+
+# 剧情模式章节 (stage_id 顺序即章节顺序)
+CAMPAIGN_STAGES = (1, 2, 3, 4, 5, 6)
 
 
 def _stage_json_path(stage_id: int) -> str:
@@ -30,8 +54,15 @@ def _stage_json_path(stage_id: int) -> str:
     return os.path.join(base, "assets", "stages", f"{name}.json")
 
 
+def stage_label(stage_id: int) -> str:
+    return STAGE_LABELS.get(stage_id, f"STAGE {stage_id}")
+
+
 class Stage:
     """通用 Stage: 持有 waves / boss spawn 时间表。"""
+
+    __slots__ = ("name", "_waves", "_wave_index", "_elapsed", "finished",
+                 "_pending_boss_spawn", "_data_path")
 
     def __init__(self, name: str, waves, pending_boss_spawn, data_path: str = ""):
         self.name = name
@@ -46,9 +77,9 @@ class Stage:
         self._wave_index = 0
         self._elapsed = 0.0
         self.finished = False
-        # 重建
         data = load_stage(self._data_path) if self._data_path else None
-        if data is None: return
+        if data is None:
+            return
         self._waves = build_waves(data)
         self._pending_boss_spawn = build_bosses(data)
 
@@ -76,15 +107,17 @@ def make_stage(stage_id: int) -> Stage:
     """按 stage_id 加载 JSON 并构造 Stage。"""
     path = _stage_json_path(stage_id)
     if not os.path.isfile(path):
-        # fallback: 用 stage1
+        # fallback: 用第一教学关
         path = _stage_json_path(1)
     data = load_stage(path)
     return Stage(
         name=data.get("name", f"Stage {stage_id}"),
         waves=build_waves(data),
         pending_boss_spawn=build_bosses(data),
+        data_path=path,
     )
 
 
 # 保留 Stage1 作为向后兼容
-__all__ = ["Stage", "make_stage", "Stage1"]
+__all__ = ["Stage", "make_stage", "Stage1", "STAGE_FILE_MAP", "STAGE_LABELS",
+           "MAX_STAGE", "CAMPAIGN_STAGES", "stage_label"]

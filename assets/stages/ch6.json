@@ -1,0 +1,756 @@
+{
+  "name": "终章 · 星之器",
+  "waves": [
+    {
+      "time": 1.5,
+      "enemies": [
+        {
+          "x": -30,
+          "y": 90,
+          "hp": 52,
+          "path": [
+            [
+              0.0,
+              -30,
+              90
+            ],
+            [
+              1.8,
+              150,
+              90
+            ],
+            [
+              4.4,
+              150,
+              90
+            ],
+            [
+              6.0,
+              150,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "aimed",
+              "color": "yellow",
+              "speed": 260,
+              "count": 3,
+              "spread": 0.05,
+              "period": 0.6,
+              "start_t": 0.0
+            }
+          ],
+          "score": 1400
+        },
+        {
+          "x": 670,
+          "y": 170,
+          "hp": 52,
+          "path": [
+            [
+              0.0,
+              670,
+              170
+            ],
+            [
+              1.8,
+              480,
+              170
+            ],
+            [
+              4.4,
+              480,
+              170
+            ],
+            [
+              6.0,
+              480,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "aimed",
+              "color": "yellow",
+              "speed": 260,
+              "count": 3,
+              "spread": 0.05,
+              "period": 0.6,
+              "start_t": 0.0
+            }
+          ],
+          "score": 1400
+        }
+      ]
+    },
+    {
+      "time": 10.0,
+      "enemies": [
+        {
+          "x": 200,
+          "y": -40,
+          "hp": 170,
+          "path": [
+            [
+              0.0,
+              200,
+              -40
+            ],
+            [
+              1.8,
+              200,
+              110
+            ],
+            [
+              7.8,
+              200,
+              110
+            ],
+            [
+              9.6,
+              260,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "delayed_ring",
+              "color": "purple",
+              "speed": 210,
+              "count": 5,
+              "split_at": 0.55,
+              "split_count": 4,
+              "split_speed": 160,
+              "period": 0.11,
+              "start_t": 0.0
+            }
+          ],
+          "score": 4200
+        },
+        {
+          "x": 440,
+          "y": -40,
+          "hp": 170,
+          "path": [
+            [
+              0.0,
+              440,
+              -40
+            ],
+            [
+              1.8,
+              440,
+              110
+            ],
+            [
+              7.8,
+              440,
+              110
+            ],
+            [
+              9.6,
+              500,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "delayed_ring",
+              "color": "purple",
+              "speed": 210,
+              "count": 5,
+              "split_at": 0.55,
+              "split_count": 4,
+              "split_speed": 160,
+              "period": 0.11,
+              "start_t": 0.0
+            }
+          ],
+          "score": 4200
+        }
+      ]
+    },
+    {
+      "time": 20.0,
+      "enemies": [
+        {
+          "x": 320,
+          "y": -40,
+          "hp": 130,
+          "path": [
+            [
+              0.0,
+              320,
+              -40
+            ],
+            [
+              1.9500000000000002,
+              320,
+              120
+            ],
+            [
+              4.95,
+              320,
+              120
+            ],
+            [
+              6.3500000000000005,
+              320.0,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "ring",
+              "color": "yellow",
+              "speed": 200,
+              "count": 18,
+              "base_angle": 0.0,
+              "rotate_speed": 0.6,
+              "speed_jitter": 0.0,
+              "period": 0.55,
+              "start_t": 0.0
+            }
+          ],
+          "score": 3000
+        },
+        {
+          "x": 180,
+          "y": -40,
+          "hp": 130,
+          "path": [
+            [
+              0.0,
+              180,
+              -40
+            ],
+            [
+              1.6,
+              180,
+              120
+            ],
+            [
+              4.6,
+              180,
+              120
+            ],
+            [
+              6.0,
+              124.0,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "ring",
+              "color": "yellow",
+              "speed": 200,
+              "count": 18,
+              "base_angle": 0.0,
+              "rotate_speed": 0.6,
+              "speed_jitter": 0.0,
+              "period": 0.55,
+              "start_t": 0.0
+            }
+          ],
+          "score": 3000
+        },
+        {
+          "x": 460,
+          "y": -40,
+          "hp": 130,
+          "path": [
+            [
+              0.0,
+              460,
+              -40
+            ],
+            [
+              1.9500000000000002,
+              460,
+              120
+            ],
+            [
+              4.95,
+              460,
+              120
+            ],
+            [
+              6.3500000000000005,
+              516.0,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "ring",
+              "color": "yellow",
+              "speed": 200,
+              "count": 18,
+              "base_angle": 0.0,
+              "rotate_speed": 0.6,
+              "speed_jitter": 0.0,
+              "period": 0.55,
+              "start_t": 0.0
+            }
+          ],
+          "score": 3000
+        }
+      ]
+    },
+    {
+      "time": 30.0,
+      "enemies": [
+        {
+          "x": 320,
+          "y": -40,
+          "hp": 280,
+          "path": [
+            [
+              0.0,
+              320,
+              -40
+            ],
+            [
+              1.8,
+              320,
+              120
+            ],
+            [
+              9.8,
+              320,
+              120
+            ],
+            [
+              11.600000000000001,
+              380,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "spiral",
+              "color": "purple",
+              "speed": 200,
+              "count": 3,
+              "step_angle": 0.22,
+              "arms": 4,
+              "period": 0.08,
+              "start_t": 0.0
+            },
+            {
+              "pattern": "fan",
+              "color": "yellow",
+              "speed": 220,
+              "count": 9,
+              "arc": "PI/2",
+              "base_angle": "aimed",
+              "rotate_speed": 0.0,
+              "period": 0.66,
+              "start_t": 0.4
+            }
+          ],
+          "score": 7000
+        }
+      ]
+    },
+    {
+      "time": 42.0,
+      "enemies": [
+        {
+          "x": -30,
+          "y": 100,
+          "hp": 140,
+          "path": [
+            [
+              0.0,
+              -30,
+              100
+            ],
+            [
+              1.8,
+              130,
+              100
+            ],
+            [
+              6.3,
+              130,
+              100
+            ],
+            [
+              7.9,
+              130,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "delayed_fan",
+              "color": "blue",
+              "speed": 250,
+              "count": 9,
+              "arc": "PI/3",
+              "base_angle": "aimed",
+              "split_at": 0.6,
+              "split_count": 4,
+              "split_speed": 175,
+              "period": 0.5,
+              "start_t": 0.0
+            }
+          ],
+          "score": 3400
+        },
+        {
+          "x": 670,
+          "y": 200,
+          "hp": 140,
+          "path": [
+            [
+              0.0,
+              670,
+              200
+            ],
+            [
+              1.8,
+              510,
+              200
+            ],
+            [
+              6.3,
+              510,
+              200
+            ],
+            [
+              7.9,
+              510,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "delayed_fan",
+              "color": "blue",
+              "speed": 250,
+              "count": 9,
+              "arc": "PI/3",
+              "base_angle": "aimed",
+              "split_at": 0.6,
+              "split_count": 4,
+              "split_speed": 175,
+              "period": 0.5,
+              "start_t": 0.0
+            }
+          ],
+          "score": 3400
+        }
+      ]
+    },
+    {
+      "time": 52.0,
+      "enemies": [
+        {
+          "x": 240,
+          "y": -40,
+          "hp": 160,
+          "path": [
+            [
+              0.0,
+              240,
+              -40
+            ],
+            [
+              1.8,
+              240,
+              130
+            ],
+            [
+              7.8,
+              240,
+              130
+            ],
+            [
+              9.6,
+              300,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "ring",
+              "color": "red",
+              "speed": 210,
+              "count": 20,
+              "base_angle": 0.0,
+              "rotate_speed": 0.8,
+              "speed_jitter": 0.0,
+              "period": 0.5,
+              "start_t": 0.0
+            }
+          ],
+          "score": 4000
+        },
+        {
+          "x": 400,
+          "y": -40,
+          "hp": 160,
+          "path": [
+            [
+              0.0,
+              400,
+              -40
+            ],
+            [
+              1.8,
+              400,
+              130
+            ],
+            [
+              7.8,
+              400,
+              130
+            ],
+            [
+              9.6,
+              460,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "ring",
+              "color": "red",
+              "speed": 210,
+              "count": 20,
+              "base_angle": 0.0,
+              "rotate_speed": -0.8,
+              "speed_jitter": 0.0,
+              "period": 0.5,
+              "start_t": 0.0
+            }
+          ],
+          "score": 4000
+        }
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "time": 64,
+      "x": 320,
+      "y": -40,
+      "hp": 800,
+      "radius": 26,
+      "label": "Mid",
+      "path": [
+        [
+          0.0,
+          320,
+          -50
+        ],
+        [
+          1.6,
+          320,
+          124
+        ],
+        [
+          13.6,
+          320,
+          124
+        ]
+      ],
+      "score": 200000,
+      "spellcards": [
+        {
+          "no": "Mid",
+          "name": "星符「落下来的光」",
+          "duration": 23,
+          "hp_threshold": 0.36,
+          "bonus_score": 260000,
+          "emitters": [
+            {
+              "pattern": "delayed_ring",
+              "color": "purple",
+              "speed": 210,
+              "count": 6,
+              "split_at": 0.55,
+              "split_count": 4,
+              "split_speed": 160,
+              "period": 0.1,
+              "start_t": 0.0
+            },
+            {
+              "pattern": "aimed",
+              "color": "yellow",
+              "speed": 280,
+              "count": 2,
+              "spread": 0.05,
+              "period": 0.35,
+              "start_t": 0.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "time": 96,
+      "x": 320,
+      "y": -50,
+      "hp": 1800,
+      "radius": 34,
+      "label": "Boss",
+      "path": [
+        [
+          0.0,
+          320,
+          -50
+        ],
+        [
+          2.0,
+          320,
+          140
+        ],
+        [
+          14.0,
+          320,
+          140
+        ]
+      ],
+      "score": 300000,
+      "spellcards": [
+        {
+          "no": "1",
+          "name": "器符「收集愿望的皿」",
+          "duration": 25,
+          "hp_threshold": 0.28,
+          "bonus_score": 380000,
+          "emitters": [
+            {
+              "pattern": "ring",
+              "color": "purple",
+              "speed": 215,
+              "count": 26,
+              "base_angle": 0.0,
+              "rotate_speed": 0.35,
+              "speed_jitter": 0.0,
+              "period": 0.48,
+              "start_t": 0.0
+            },
+            {
+              "pattern": "fan",
+              "color": "yellow",
+              "speed": 230,
+              "count": 11,
+              "arc": "PI/2",
+              "base_angle": "aimed",
+              "rotate_speed": 0.0,
+              "period": 0.5,
+              "start_t": 0.0
+            }
+          ]
+        },
+        {
+          "no": "2",
+          "name": "星符「被吃掉的夜空」",
+          "duration": 27,
+          "hp_threshold": 0.35,
+          "bonus_score": 600000,
+          "emitters": [
+            {
+              "pattern": "delayed_ring",
+              "color": "blue",
+              "speed": 200,
+              "count": 7,
+              "split_at": 0.6,
+              "split_count": 4,
+              "split_speed": 165,
+              "period": 0.11,
+              "start_t": 0.0
+            },
+            {
+              "pattern": "spiral",
+              "color": "purple",
+              "speed": 210,
+              "count": 2,
+              "step_angle": 0.3,
+              "arms": 3,
+              "period": 0.08,
+              "start_t": 0.0
+            }
+          ]
+        },
+        {
+          "no": "3",
+          "name": "终符「七个人的愿望」",
+          "duration": 28,
+          "hp_threshold": 0.4,
+          "bonus_score": 800000,
+          "emitters": [
+            {
+              "pattern": "ring",
+              "color": "red",
+              "speed": 220,
+              "count": 36,
+              "base_angle": 0.0,
+              "rotate_speed": 0.45,
+              "speed_jitter": 0.0,
+              "period": 0.42,
+              "start_t": 0.0
+            },
+            {
+              "pattern": "aimed",
+              "color": "yellow",
+              "speed": 300,
+              "count": 3,
+              "spread": 0.04,
+              "period": 0.26,
+              "start_t": 0.0
+            }
+          ]
+        },
+        {
+          "no": "Final",
+          "name": "奥义「把星星还给我」",
+          "duration": 32,
+          "hp_threshold": 0.55,
+          "bonus_score": 1200000,
+          "emitters": [
+            {
+              "pattern": "delayed_fan",
+              "color": "purple",
+              "speed": 260,
+              "count": 15,
+              "arc": "PI/2",
+              "base_angle": "aimed",
+              "split_at": 0.55,
+              "split_count": 5,
+              "split_speed": 180,
+              "period": 0.46,
+              "start_t": 0.0
+            },
+            {
+              "pattern": "ring",
+              "color": "blue",
+              "speed": 190,
+              "count": 28,
+              "base_angle": 0.0,
+              "rotate_speed": -0.3,
+              "speed_jitter": 0.0,
+              "period": 0.55,
+              "start_t": 0.0
+            },
+            {
+              "pattern": "aimed",
+              "color": "yellow",
+              "speed": 300,
+              "count": 1,
+              "spread": 0.0,
+              "period": 0.3,
+              "start_t": 0.15
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

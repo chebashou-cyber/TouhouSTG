@@ -99,6 +99,14 @@ class InputManager:
                 return True
         return False
 
+    def clear_pressed(self) -> None:
+        """丢弃本帧所有「刚按下」状态。
+
+        用于场景切换: 对话里按的 Z 不应漏到游戏里变成开火/放炸弹。
+        """
+        self._pressed_this_frame.clear()
+        self._released_this_frame.clear()
+
     def buffer_size(self) -> int:
         return len(self._buffer)
 
