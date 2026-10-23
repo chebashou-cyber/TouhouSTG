@@ -29,7 +29,8 @@ python main.py
 | 行 | 说明 |
 | --- | --- |
 | START | 剧情模式：六章连续闯关，中途不退出 |
-| STAGE | 单关练习：0 教学关 / 1~6 剧情章 / 7~9 EX 关 |
+| STAGE | 单关练习：0 教学关 / 1~7 剧情章与 EX 章 / 8~10 追加 EX 关 |
+| EXTRA | EX 章「星之残响」：本篇全通一次后解锁 |
 | DIFFICULTY | EASY / NORMAL / HARD / LUNATIC |
 | REPLAY | 播放 `replay/` 里最新的一份录像 |
 | QUIT | 退出 |
@@ -42,7 +43,7 @@ python main.py
 - X：炸弹（清屏 + 无敌 2s + 计分）
 - P：暂停 / 恢复
 - Esc：退出
-- R：Game Over / Stage Clear 后重来
+- R：Game Over 后整局重来；暂停时按 R 只重开当前这一关/一章
 - F1 调试 overlay / F2 帧步进 / F3 无敌 / F4 清屏
 
 剧情对话中：Z / Enter 继续（未打完则立刻打完），X 跳过整段。
@@ -60,6 +61,14 @@ python main.py
 | 四章 | 星之书库 | 紫书（记录者） | 星之器是照着我的书造的 |
 | 五章 | 机关天守 | 机织 零（机关人偶） | 三百六十一年，一直在数星星 |
 | 终章 | 星之器 | 穹（守护者） | 愿望需要燃料，夜空就是燃料 |
+| EX | 星之残响 | 残响（装置的残渣） | 等最后一个愿望，然后真的熄灭 |
+
+EX 章是本篇全通一次后解锁的追加章：只有一章、没有结局，打完直接 `EX CLEAR` 结算。
+它的弹幕密度和符卡数（2 + 4 张）是全线最高的。
+
+| EX 章剧情 |
+| --- |
+| ![EX](docs/screenshots/07_ex_story.png) |
 
 剧情数据全部在 [`assets/story/campaign.json`](assets/story/campaign.json)：
 角色名 / 立绘颜色 / 站位、每章的前置对话（prologue）、Boss 登场对话（boss_intro）、
@@ -85,11 +94,11 @@ python main.py
 
 ## 关卡数据
 
-六个剧情章在 `assets/stages/ch1.json ~ ch6.json`，由
+七个剧情关卡（六章 + EX 章）在 `assets/stages/ch1.json ~ ch7.json`，由
 [`tools/gen_stages.py`](tools/gen_stages.py) 生成：
 
 ```powershell
-python tools/gen_stages.py           # 重新生成 ch1..ch6
+python tools/gen_stages.py           # 重新生成 ch1..ch7
 python tools/gen_stages.py --check   # 只校验，不写文件
 ```
 
@@ -107,7 +116,7 @@ game/
 ├── main.py                   入口
 ├── config.py                 全局数值 / 颜色 / 难度曲线
 ├── assets/
-│   ├── stages/               关卡 JSON (ch1..ch6 = 剧情六章, stage*.json = 教学/EX)
+│   ├── stages/               关卡 JSON (ch1..ch7 = 剧情六章 + EX 章, stage*.json = 教学/旧 EX)
 │   └── story/campaign.json   剧情脚本 + 角色定义
 ├── docs/screenshots/         无头截图 (README 用)
 ├── replay/                   录像输出 (自动生成, 已 gitignore)
@@ -139,11 +148,14 @@ game/
 ```powershell
 python tools\check_ast.py      # 静态检查：语法 / import 链 / JSON 合法性
 python tools\smoke_test.py     # 模块冒烟：对象池、弹幕模式、Replay、UI
-python tools\story_smoke.py    # 端到端：六章连续闯关直到 ALL CLEAR
+python tools\story_smoke.py    # 端到端：六章连续闯关 + EX 章 + 压力测试
 ```
 
-`story_smoke.py` 会真的跑完整流程：自动跳过所有对话、秒杀每个 Boss、
-检查章节顺序、分数继承、存档写入，最后渲染 ALL CLEAR 画面。
+`story_smoke.py` 会真的跑完整流程：自动跳过所有对话、秒杀每个 Boss，
+检查章节顺序、分数继承、存档写入、暂停「重开本章」的语义、EX 章解锁条件，
+最后渲染 ALL CLEAR / EX CLEAR 画面；末尾还会用 LUNATIC 在 EX 关满密度跑 100 秒，
+确认弹幕数量不会失控（当前峰值约 2000 颗）。
+
 它把存档重定向到临时目录，不会污染 `save/records.json`。
 
 三个脚本的退出码都是 `0` 通过 / `1` 失败，可直接接 CI。
@@ -189,8 +201,9 @@ bash tools/build.sh    # Linux / macOS
 ## 变更点 (v0.6 -> v1.0)
 
 - **剧情模式**：6 章连续闯关，章首 / Boss 登场 / 章末对话，结局与 ALL CLEAR
+- **EX 章**：本篇全通一次后解锁「星之残响」，弹幕密度与符卡数全线最高，打完是 EX CLEAR
 - **章节继承**：残机 / 炸弹 / 火力 / 分数 / 擦弹跨章保留（原先打完一关就回菜单）
-- **关卡**：新增六章主线和 8 种编队模式，Boss 符卡从 2~3 张提升到 3~5 张
+- **关卡**：新增七章主线和 8 种编队模式，Boss 符卡从 2~3 张提升到 3~6 张
 - **存档**：`save/records.json` 记录各难度最高分与全通次数，标题画面显示 BEST
 - **修 bug**：
   - `pygame.font.SysFont` 在部分 Windows 机器上直接抛 `TypeError`，游戏起不来 —— 改为直接指定字体文件，并接入中文字体
@@ -198,4 +211,5 @@ bash tools/build.sh    # Linux / macOS
   - 自机机身颜色恒为白色（`bomb_time=0` 时取错分支）
   - 教学关提示被重复绘制两次；`_tutorial_hints` 每帧重建
   - 菜单关卡上限与 `STAGE_FILE_MAP` 差一位，教学关与 EX 关选不到
+  - 剧情模式暂停里写「R 重开本关」但实际重开整局 —— 现在真的只重开当前章
   - `check_ast.py` 不认 `from package import submodule`，误报

@@ -49,6 +49,12 @@
       "title": "星之器的守护者",
       "color": [255, 225, 160],
       "side": "right"
+    },
+    "canxiang": {
+      "name": "残响",
+      "title": "星之器留下的回声",
+      "color": [255, 190, 215],
+      "side": "right"
     }
   },
   "chapters": [
@@ -256,6 +262,39 @@
       ]
     }
   ],
+  "ex_chapter": {
+    "id": 7,
+    "stage_id": 7,
+    "title": "EX",
+    "subtitle": "星之残响",
+    "bg_tint": [20, 8, 24],
+    "prologue": [
+      { "text": "星之器碎了。可那片天空，偶尔还会传下来一点声音。" },
+      { "speaker": "ruye", "text": "铃岚，你听到了吗？像有人在很远的地方喊。" },
+      { "speaker": "rein", "text": "不是人。是残响。" },
+      { "text": "碎掉的装置还留着一小片核心。里面有个很轻的声音，在重复同一句话。" },
+      { "speaker": "canxiang", "text": "……愿望，收到了。" },
+      { "speaker": "rein", "text": "都碎了，还在收。" },
+      { "speaker": "ruye", "text": "它在等谁呀？" },
+      { "speaker": "rein", "text": "上去看看就知道了。" }
+    ],
+    "boss_intro": [
+      { "speaker": "canxiang", "text": "你不该来的。这里没有星星了，只剩回声。" },
+      { "speaker": "rein", "text": "那你还在等什么？" },
+      { "speaker": "canxiang", "text": "等最后一个愿望。有了它，我就能再亮一次。" },
+      { "speaker": "ruye", "text": "再亮一次，然后呢？" },
+      { "speaker": "canxiang", "text": "然后……就真的熄灭了。" },
+      { "speaker": "rein", "text": "那我陪你亮完这一次。" }
+    ],
+    "clear": [
+      { "speaker": "canxiang", "text": "亮了。……原来这么亮。" },
+      { "speaker": "ruye", "text": "残响，你看见了吗？天上那颗，是你。" },
+      { "speaker": "canxiang", "text": "我看见了。……谢谢。" },
+      { "text": "那片天空彻底暗下去，然后又亮起来——这次是自己亮的。" },
+      { "speaker": "rein", "text": "走吧。回去了。" },
+      { "speaker": "ruye", "text": "下次还有这种『残响』，也叫我一起！" }
+    ]
+  },
   "ending": [
     { "text": "那天之后，博丽神社上空的星星，一颗一颗回来了。" },
     { "speaker": "ruye", "text": "铃岚！你看！北斗七星，七颗都在！" },

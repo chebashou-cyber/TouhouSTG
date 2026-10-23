@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import os
 import sys
+import tempfile
 
 os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
 os.environ.setdefault("SDL_AUDIODRIVER", "dummy")
@@ -99,11 +100,22 @@ def main() -> int:
     game._best_score = 12345678
     save(game, out_dir, "06_allclear.png")
 
+    # 7) EX 章剧情 (残响)
+    game = Game()
+    game.save._path = os.path.join(tempfile.mkdtemp(prefix="touhou-shot-"), "records.json")
+    game.save.add_clear(1)
+    game._start_ex(difficulty=1)
+    for _ in range(4):
+        game.dialogue.advance()
+    for _ in range(90):
+        game.dialogue.update(LOGIC_DT)
+        game.dialogue_box.update(LOGIC_DT)
+    save(game, out_dir, "07_ex_story.png")
+
     game._close_recorder()
     pygame.quit()
     print("\n截图完成")
     return 0
-
 
 if __name__ == "__main__":
     raise SystemExit(main())

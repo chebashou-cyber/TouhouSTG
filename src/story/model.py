@@ -68,11 +68,14 @@ class Campaign:
     characters: dict[str, Character]
     chapters: list[Chapter]
     ending: list[Line] = field(default_factory=list)
+    ex_chapter: Chapter | None = None   # 通关本篇后解锁的 EX 章
 
     def chapter_for_stage(self, stage_id: int) -> Chapter | None:
         for ch in self.chapters:
             if ch.stage_id == stage_id:
                 return ch
+        if self.ex_chapter is not None and self.ex_chapter.stage_id == stage_id:
+            return self.ex_chapter
         return None
 
     def chapter(self, chapter_id: int) -> Chapter | None:
@@ -108,6 +111,24 @@ def _parse_lines(raw, where: str) -> list[Line]:
     return out
 
 
+def _parse_chapter(raw, index: int, where_root: str) -> Chapter:
+    where = f"{where_root}[{index}]" if where_root == "chapters" else where_root
+    if not isinstance(raw, dict):
+        raise ValueError(f"{where}: 应为对象")
+    if "stage_id" not in raw:
+        raise ValueError(f"{where}: 缺少 stage_id")
+    return Chapter(
+        id=int(raw.get("id", index + 1)),
+        stage_id=int(raw["stage_id"]),
+        title=raw.get("title", ""),
+        subtitle=raw.get("subtitle", ""),
+        prologue=_parse_lines(raw.get("prologue"), f"{where}.prologue"),
+        boss_intro=_parse_lines(raw.get("boss_intro"), f"{where}.boss_intro"),
+        clear=_parse_lines(raw.get("clear"), f"{where}.clear"),
+        bg_tint=_as_color(raw.get("bg_tint"), (10, 10, 24)),
+    )
+
+
 def default_campaign_path() -> str:
     base = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     return os.path.join(base, "assets", "story", "campaign.json")
@@ -135,26 +156,17 @@ def load_campaign(path: str | None = None) -> Campaign:
 
     chapters: list[Chapter] = []
     for i, raw in enumerate(data.get("chapters") or []):
-        where = f"chapters[{i}]"
-        if not isinstance(raw, dict):
-            raise ValueError(f"{where}: 应为对象")
-        if "stage_id" not in raw:
-            raise ValueError(f"{where}: 缺少 stage_id")
-        ch = Chapter(
-            id=int(raw.get("id", i + 1)),
-            stage_id=int(raw["stage_id"]),
-            title=raw.get("title", ""),
-            subtitle=raw.get("subtitle", ""),
-            prologue=_parse_lines(raw.get("prologue"), f"{where}.prologue"),
-            boss_intro=_parse_lines(raw.get("boss_intro"), f"{where}.boss_intro"),
-            clear=_parse_lines(raw.get("clear"), f"{where}.clear"),
-            bg_tint=_as_color(raw.get("bg_tint"), (10, 10, 24)),
-        )
-        chapters.append(ch)
+        chapters.append(_parse_chapter(raw, i, "chapters"))
+
+    ex_chapter: Chapter | None = None
+    raw_ex = data.get("ex_chapter")
+    if raw_ex is not None:
+        ex_chapter = _parse_chapter(raw_ex, 0, "ex_chapter")
 
     # 台词里引用的说话人必须存在, 否则渲染时没有名字/颜色
     known = set(characters)
-    for ch in chapters:
+    all_chapters = list(chapters) + ([ex_chapter] if ex_chapter else [])
+    for ch in all_chapters:
         for group in (ch.prologue, ch.boss_intro, ch.clear):
             for line in group:
                 if line.speaker is not None and line.speaker not in known:
@@ -170,4 +182,5 @@ def load_campaign(path: str | None = None) -> Campaign:
     if not chapters:
         raise ValueError("campaign.json: chapters 为空")
 
-    return Campaign(characters=characters, chapters=chapters, ending=ending)
+    return Campaign(characters=characters, chapters=chapters, ending=ending,
+                    ex_chapter=ex_chapter)

@@ -4,7 +4,8 @@
 关卡表 (stage_id -> JSON 文件):
   0        教学关
   1..6     剧情模式六章 (ch1..ch6), 也可以单关练习
-  7..9     EX 追加关 (旧版的 stage2 / stage4 / stage5)
+  7        EX 章「星之残响」, 通关本篇后解锁
+  8..10    EX 追加关 (旧版的 stage2 / stage4 / stage5)
 
 make_stage(stage_id) -> Stage
 """
@@ -23,9 +24,10 @@ STAGE_FILE_MAP = {
     4: "ch4",      # 四章 星之书库
     5: "ch5",      # 五章 机关天守
     6: "ch6",      # 终章 星之器
-    7: "stage2",   # EX 弹幕风暴
-    8: "stage4",   # EX 中阶
-    9: "stage5",   # EX 高难
+    7: "ch7",      # EX 章 星之残响
+    8: "stage2",   # EX 弹幕风暴
+    9: "stage4",   # EX 中阶
+    10: "stage5",  # EX 高难
 }
 
 # 关卡显示名 (菜单 / Stage Clear / 结算用)
@@ -37,15 +39,19 @@ STAGE_LABELS = {
     4: "四章 · 星之书库",
     5: "五章 · 机关天守",
     6: "终章 · 星之器",
-    7: "EX1 · 弹幕风暴",
-    8: "EX2 · 中阶",
-    9: "EX3 · 高难",
+    7: "EX · 星之残响",
+    8: "EX1 · 弹幕风暴",
+    9: "EX2 · 中阶",
+    10: "EX3 · 高难",
 }
 
 MAX_STAGE = max(STAGE_FILE_MAP)
 
 # 剧情模式章节 (stage_id 顺序即章节顺序)
 CAMPAIGN_STAGES = (1, 2, 3, 4, 5, 6)
+
+# EX 章 (通关本篇后解锁) 的 stage_id
+EX_STAGE_ID = 7
 
 
 def _stage_json_path(stage_id: int) -> str:

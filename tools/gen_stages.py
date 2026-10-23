@@ -516,6 +516,81 @@ def stage_ch6():
     return {"name": "终章 · 星之器", "waves": waves, "bosses": bosses}
 
 
+# ---------------------------------------------------------------- EX 章
+def stage_ch7():
+    """EX 章「星之残响」: 本篇通关后解锁, 密度与符卡数都是全线最高。"""
+    waves = [
+        {"time": 1.5, "enemies": [
+            sweep(-30, 90, 150, hold=2.4, hp=60, score=1600,
+                  emitters=[aimed("purple", 280, 3, 0.05, period=0.55)]),
+            sweep(670, 150, 490, hold=2.4, hp=60, score=1600,
+                  emitters=[aimed("purple", 280, 3, 0.05, period=0.55)]),
+            sweep(-30, 210, 170, hold=2.4, hp=60, score=1600,
+                  emitters=[fan("blue", 230, 7, "PI/3", "aimed", 0.5)]),
+        ]},
+        {"time": 10.0, "enemies": [
+            drop_in(180, 110, hp=190, score=4600, hold=6.0,
+                    emitters=[delayed_ring("blue", 220, 6, 0.55, 4, 170, period=0.1)]),
+            drop_in(460, 110, hp=190, score=4600, hold=6.0,
+                    emitters=[delayed_ring("blue", 220, 6, 0.55, 4, 170, period=0.1)]),
+        ]},
+        {"time": 20.0, "enemies": [
+            drop_in(320, 120, hp=320, score=8000, hold=8.0,
+                    emitters=[ring("yellow", 210, 24, rotate_speed=0.7, period=0.45),
+                              spiral("purple", 200, 3, 0.28, arms=3, period=0.08)]),
+        ]},
+        {"time": 32.0, "enemies": stream(6, -30, 100, 670, 100, 0.0, 0.5, hp=44, score=1300,
+                                         emitters=[scatter("red", 210, 6, "PI/2",
+                                                           "PI/4", 0.45, rng_seed=21)])},
+        {"time": 42.0, "enemies": [
+            sweep(-30, 120, 130, hold=4.5, hp=170, score=3800,
+                  emitters=[delayed_fan("yellow", 260, 11, "PI/2", "aimed", 0.58, 4, 180,
+                                        period=0.46)]),
+            sweep(670, 200, 510, hold=4.5, hp=170, score=3800,
+                  emitters=[delayed_fan("yellow", 260, 11, "PI/2", "aimed", 0.58, 4, 180,
+                                        period=0.46)]),
+        ]},
+        {"time": 53.0, "enemies": [
+            drop_in(240, 130, hp=200, score=4800, hold=6.0,
+                    emitters=[spiral("red", 210, 4, 0.24, arms=4, period=0.08)]),
+            drop_in(400, 130, hp=200, score=4800, hold=6.0,
+                    emitters=[spiral("red", 210, 4, -0.24, arms=4, period=0.08)]),
+        ]},
+    ]
+    bosses = [
+        boss(66, 320, -40, 900, "Mid", 26, boss_path(124, 1.6), 220000, spells(
+            spell("Mid", "残响「越走越远的声音」", 24, 0.34, 300000, [
+                ring("purple", 215, 22, rotate_speed=0.75, period=0.45),
+                aimed("yellow", 300, 3, 0.05, period=0.3),
+            ]),
+            spell("Mid2", "回符「说过的最后一句话」", 24, 0.36, 380000, [
+                delayed_fan("blue", 260, 11, "PI/2", "aimed", 0.58, 4, 175, period=0.46),
+                spiral("purple", 200, 2, -0.32, arms=3, period=0.08),
+            ]),
+        )),
+        boss(102, 320, -50, 2200, "Boss", 34, boss_path(140, 2.0), 320000, spells(
+            spell("1", "残符「尚有余温的光」", 26, 0.26, 420000, [
+                ring("yellow", 220, 28, rotate_speed=0.4, period=0.44),
+                fan("purple", 240, 13, "PI/2", "aimed", 0.46),
+            ]),
+            spell("2", "响符「回声套着回声」", 26, 0.32, 620000, [
+                delayed_ring("blue", 210, 8, 0.55, 4, 175, period=0.1),
+                aimed("red", 300, 4, 0.05, period=0.28),
+            ]),
+            spell("3", "熄符「熄灭之前的一秒」", 28, 0.38, 820000, [
+                ring("red", 230, 34, rotate_speed=0.5, period=0.4),
+                spiral("purple", 215, 3, 0.3, arms=4, period=0.075),
+            ]),
+            spell("Final", "终符「谢幕的星屑」", 32, 0.55, 1400000, [
+                delayed_fan("yellow", 270, 15, "PI/2", "aimed", 0.55, 5, 185, period=0.44),
+                ring("blue", 200, 30, rotate_speed=-0.35, period=0.5),
+                aimed("red", 310, 2, 0.04, period=0.26, start_t=0.12),
+            ]),
+        )),
+    ]
+    return {"name": "EX · 星之残响", "waves": waves, "bosses": bosses}
+
+
 GEN = {
     "ch1": stage_ch1,
     "ch2": stage_ch2,
@@ -523,6 +598,7 @@ GEN = {
     "ch4": stage_ch4,
     "ch5": stage_ch5,
     "ch6": stage_ch6,
+    "ch7": stage_ch7,
 }
 
 

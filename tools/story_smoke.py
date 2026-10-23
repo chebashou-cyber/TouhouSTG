@@ -62,9 +62,13 @@ def story_data():
         assert ch.prologue or ch.clear, f"章 {ch.id} 没有任何台词"
         path = stage_factory._stage_json_path(ch.stage_id)
         assert os.path.isfile(path), f"章 {ch.id} 的关卡文件不存在: {path}"
+    assert c.ex_chapter is not None, "缺少 EX 章 (ex_chapter)"
+    assert c.ex_chapter.prologue and c.ex_chapter.clear, "EX 章台词不完整"
+    ex_path = stage_factory._stage_json_path(c.ex_chapter.stage_id)
+    assert os.path.isfile(ex_path), f"EX 章关卡文件不存在: {ex_path}"
 
 
-check("剧情数据: 6 章 + 结局 + 关卡文件齐全", story_data)
+check("剧情数据: 6 章 + EX 章 + 结局 + 关卡文件齐全", story_data)
 
 
 def stage_data():
@@ -88,7 +92,7 @@ def stage_data():
               f" waves={len(waves):<2} bosses={len(bosses)} enemies={n}")
 
 
-check("关卡数据: stage 0..9 全部可加载/生成", stage_data)
+check("关卡数据: stage 0..10 全部可加载/生成", stage_data)
 
 
 # ---------------------------------------------------------------- 2. 对话状态机
@@ -183,7 +187,7 @@ def practice_all_stages():
     print(f"     练习模式 0..{game_mod.MAX_STAGE_ID} 全部可开局")
 
 
-check("练习模式: 0..9 全部可开局并渲染", practice_all_stages)
+check(f"练习模式: 0..{game_mod.MAX_STAGE_ID} 全部可开局并渲染", practice_all_stages)
 
 
 # ---------------------------------------------------------------- 5. 菜单/标题渲染
@@ -199,6 +203,111 @@ def title_and_menus():
 
 
 check("标题/暂停/GameOver/StageClear 画面渲染", title_and_menus)
+
+
+# ---------------------------------------------------------------- 6. 暂停重开本章
+def pause_restart_chapter():
+    """暂停里的 R 只能重开当前章, 不能把整局重来。"""
+    game = game_mod.Game()
+    tmp = tempfile.mkdtemp(prefix="touhou-save-")
+    game.save._path = os.path.join(tmp, "records.json")
+    game.god_mode = True
+    game._start_story(difficulty=1)
+    game._finish_story()                     # 第一章开场对话结束 -> play
+    game.player.score = 100000               # 假装打完第一章
+    game._carry = {"score": 100000, "lives": 4, "bombs": 3, "power": 40, "graze": 12}
+    game.chapter_index = 1
+    game._begin_chapter()                    # 进入第二章
+    game._finish_story()                     # 第二章开场对话结束 -> play
+    assert game.chapter_index == 1, f"应在第二章, 实际 {game.chapter_index}"
+    game.player.score = 555555               # 第二章中途得分
+    game.player.lives = 1
+
+    game._apply_action(("restart_stage",))
+
+    assert game.chapter_index == 1, f"重开本章后章节变了: {game.chapter_index}"
+    assert game.scene == "play", f"重开本章后场景: {game.scene}"
+    assert game.player.score == 100000, f"分数应回到本章开局值, 实际 {game.player.score}"
+    assert game.player.lives == 4, f"残机应回到本章开局值, 实际 {game.player.lives}"
+    assert game.player.power == 40, f"火力应回到本章开局值, 实际 {game.player.power}"
+    game._close_recorder()
+    print(f"     重开本章: 章节={game.chapter_index} 分数={game.player.score}"
+          f" 残机={game.player.lives} 火力={game.player.power}")
+
+
+check("暂停重开本章: 回到本章开局状态, 不重开整局", pause_restart_chapter)
+
+
+# ---------------------------------------------------------------- 7. EX 章
+def ex_chapter_run():
+    game = game_mod.Game()
+    tmp = tempfile.mkdtemp(prefix="touhou-save-")
+    game.save._path = os.path.join(tmp, "records.json")
+    game.god_mode = True
+
+    # 未通关时不可进
+    game._start_ex(difficulty=1)
+    assert game.scene == "title", "未解锁时不该进入 EX 章"
+    assert not game._ex_unlocked(), "初次启动时 EX 不应解锁"
+
+    # 伪造一次全通 -> 解锁
+    game.save.add_clear(1)
+    assert game._ex_unlocked(), "通关后 EX 未解锁"
+
+    game._start_ex(difficulty=1)
+    assert game.scene == "story", f"EX 开场应进入剧情, 实际 {game.scene}"
+    assert game._is_ex, "EX 标志未置位"
+    assert game._total_chapters() == 1, f"EX 应只有 1 章, 实际 {game._total_chapters()}"
+
+    frames = 0
+    limit = 200000
+    while game.scene != "allclear" and frames < limit:
+        frames += 1
+        if game.scene == "story":
+            _press(game, "z")
+            game._update_story(LOGIC_DT)
+        elif game.scene == "play":
+            game._step(LOGIC_DT)
+            b = game.boss
+            if b is not None and b.state == "spell":
+                b.hit(10 ** 7)
+        else:
+            raise AssertionError(f"EX 章不该进入 {game.scene}")
+        if frames % 25 == 0:
+            game._render()
+
+    assert game.scene == "allclear", f"EX 未通关, 停在 {game.scene}"
+    assert game.chapters_cleared == 1, f"EX 章计数应为 1, 实际 {game.chapters_cleared}"
+    assert game.stage_id == 7, f"EX 关卡 id 应为 7, 实际 {game.stage_id}"
+    game._render()                     # EX CLEAR 画面
+    game._close_recorder()
+    print(f"     EX 章通关: 帧数={frames} 分数={game.player.score}")
+
+
+check("EX 章: 解锁条件 + 单章通关到 EX CLEAR", ex_chapter_run)
+
+
+# ---------------------------------------------------------------- 8. LUNATIC 压力
+def lunatic_stress():
+    """LUNATIC 满密度跑 100 秒, 确认不崩、弹幕数量不会失控。"""
+    game = game_mod.Game()
+    tmp = tempfile.mkdtemp(prefix="touhou-save-")
+    game.save._path = os.path.join(tmp, "records.json")
+    game.god_mode = True
+    game._start_practice(difficulty=3, stage_id=7)
+    game._title_card_t = 0.0
+    peak = 0
+    for _ in range(60 * 100):
+        game._step(LOGIC_DT)
+        n = game.pool.enemy_count()
+        if n > peak:
+            peak = n
+    assert peak < 12000, f"LUNATIC 弹幕数量失控: {peak}"
+    game._close_recorder()
+    print(f"     LUNATIC EX 关 100s: 峰值敌弹={peak}")
+
+
+check("LUNATIC 压力: EX 关满密度 100s", lunatic_stress)
 
 
 print()

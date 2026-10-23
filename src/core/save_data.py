@@ -93,3 +93,7 @@ class SaveData:
 
     def clear_count(self, difficulty: int) -> int:
         return self.clears.get(self._key(difficulty), 0)
+
+    def total_clears(self) -> int:
+        """所有难度的全通次数之和 (用于解锁 EX 章)。"""
+        return sum(self.clears.values())

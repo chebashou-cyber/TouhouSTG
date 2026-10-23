@@ -58,7 +58,7 @@ from config import (
     DIFFICULTY_DEFAULT, DIFFICULTY_MULTIPLIERS, DIFFICULTY_NAMES,
     CONTINUE_MAX, CONTINUE_LIVES, CONTINUE_BOMBS, CONTINUE_POWER,
     BOSS_DEFEAT_P_DROP, BOSS_DEFEAT_SCORE_DROP, BOSS_DEFEAT_DROP_JITTER,
-    STAGE_TITLE_CARD_TIME, CHAPTER_CLEAR_BONUS, ALL_CLEAR_BONUS,
+    STAGE_TITLE_CARD_TIME, CHAPTER_CLEAR_BONUS, ALL_CLEAR_BONUS, EX_CLEAR_BONUS,
 )
 
 # ---------------- 模式 ----------------
@@ -135,7 +135,10 @@ class Game:
         self.mode = MODE_PRACTICE
         self.chapter_index = 0
         self.chapters_cleared = 0
+        self._chapters: list[Chapter] = []       # 本局要打的章节序列
+        self._is_ex = False                      # 当前是否在打 EX 章
         self._carry: dict | None = None
+        self._chapter_carry: dict | None = None  # 进入本章时的资源快照 (重开本章用)
         self._best_score = self.save.best_score(DIFFICULTY_DEFAULT)
 
         self.scene = "title"
@@ -275,12 +278,12 @@ class Game:
 
     # ================= 章节流程 =================
     def _total_chapters(self) -> int:
-        return len(self.campaign.chapters) if self.campaign else 0
+        return len(self._chapters)
 
     def _current_chapter(self) -> Chapter | None:
-        if not self.campaign or not (0 <= self.chapter_index < len(self.campaign.chapters)):
+        if not (0 <= self.chapter_index < len(self._chapters)):
             return None
-        return self.campaign.chapters[self.chapter_index]
+        return self._chapters[self.chapter_index]
 
     def _start_story(self, difficulty: int) -> None:
         if not self.campaign:
@@ -288,6 +291,38 @@ class Game:
             return
         self.mode = MODE_STORY
         self.difficulty = difficulty
+        self._is_ex = False
+        self._chapters = list(self.campaign.chapters)
+        self.chapter_index = 0
+        self.chapters_cleared = 0
+        self.continue_left = CONTINUE_MAX
+        self.continue_used = 0
+        self._carry = {
+            "score": 0,
+            "lives": PLAYER_START_LIVES,
+            "bombs": PLAYER_START_BOMBS,
+            "power": PLAYER_START_POWER,
+            "graze": 0,
+        }
+        self._begin_chapter()
+
+    def _ex_unlocked(self) -> bool:
+        """EX 章解锁条件: 本篇至少全通一次 (任意难度)。"""
+        return (self.campaign is not None
+                and self.campaign.ex_chapter is not None
+                and self.save.total_clears() > 0)
+
+    def _start_ex(self, difficulty: int) -> None:
+        """EX 章: 单章剧情, 打完直接 EX CLEAR, 不播本篇结局。"""
+        if not self._ex_unlocked():
+            print("[story] EX 章未解锁: 需要先通关本篇一次")
+            return
+        ex = self.campaign.ex_chapter
+        assert ex is not None
+        self.mode = MODE_STORY
+        self.difficulty = difficulty
+        self._is_ex = True
+        self._chapters = [ex]
         self.chapter_index = 0
         self.chapters_cleared = 0
         self.continue_left = CONTINUE_MAX
@@ -306,11 +341,25 @@ class Game:
         if ch is None:
             self._finish_run()
             return
+        # 记下进入本章时的资源, 暂停里「重开本章」回到这个状态
+        self._chapter_carry = dict(self._carry) if self._carry else None
         self._reset_stage_objects(ch.stage_id)
         self._reset_player(self._carry)
         self._title_card_pending = (ch.display_title, self.stage.name)
         self._boss_intro_played = False
         self._play_story(ch.prologue, AFTER_PLAY)
+
+    def _restart_chapter(self) -> None:
+        """暂停菜单的「重开本章」: 回到本章开局状态, 不再播开场对话。"""
+        ch = self._current_chapter()
+        if ch is None:
+            return
+        self._close_recorder()
+        self._reset_stage_objects(ch.stage_id)
+        self._reset_player(self._chapter_carry)
+        self._title_card_pending = (ch.display_title, self.stage.name)
+        self._boss_intro_played = True
+        self._begin_play()
 
     def _advance_chapter(self) -> None:
         """一章打完: 结算分数, 存下 carry, 进入下一章。"""
@@ -331,15 +380,16 @@ class Game:
             self._begin_chapter()
 
     def _finish_run(self) -> None:
-        """最后一章打完: 播结局 -> ALL CLEAR。"""
+        """最后一章打完: 本篇播结局, EX 章直接结算。"""
         self._close_recorder()
-        if self.campaign and self.campaign.ending and self.scene != "allclear":
+        if (not self._is_ex and self.campaign and self.campaign.ending
+                and self.scene != "allclear"):
             self._play_story(self.campaign.ending, AFTER_ALL_CLEAR)
         else:
             self._all_clear()
 
     def _all_clear(self) -> None:
-        self.player.score += ALL_CLEAR_BONUS
+        self.player.score += EX_CLEAR_BONUS if self._is_ex else ALL_CLEAR_BONUS
         self.save.submit(self.difficulty, self.player.score)
         self.save.add_clear(self.difficulty)
         self._refresh_best()
@@ -354,8 +404,11 @@ class Game:
         self.continue_left = CONTINUE_MAX
         self.continue_used = 0
         self._carry = None
+        self._chapter_carry = None
         self.chapter_index = 0
         self.chapters_cleared = 0
+        self._is_ex = False
+        self._chapters = []
         self._reset_stage_objects(self.stage_id)
         self._reset_player(None)
         self.player.score = 0
@@ -401,9 +454,21 @@ class Game:
             self._start_story(difficulty=action[1])
         elif kind == "start_practice":
             self._start_practice(difficulty=action[1], stage_id=action[2])
+        elif kind == "start_ex":
+            self._start_ex(difficulty=action[1])
+        elif kind == "restart_stage":
+            # 暂停里按 R: 只重开当前这一关/一章
+            if self.mode == MODE_STORY:
+                self._restart_chapter()
+            else:
+                self._start_practice(self.difficulty, self.stage_id)
         elif kind == "restart":
-            if self.mode == MODE_STORY and self.scene not in ("title",):
-                self._start_story(self.difficulty)
+            # Game Over / 结算画面按 R: 整局重来
+            if self.mode == MODE_STORY:
+                if self._is_ex:
+                    self._start_ex(self.difficulty)
+                else:
+                    self._start_story(self.difficulty)
             else:
                 self._start_practice(self.difficulty, self.stage_id)
         elif kind == "continue_or_restart":
@@ -725,7 +790,8 @@ class Game:
             self._render_world()
 
         if self.scene == "title":
-            self.menu.draw(self.screen, "title", best_score=self._best_score)
+            self.menu.draw(self.screen, "title", best_score=self._best_score,
+                           ex_unlocked=self._ex_unlocked())
         elif self.scene == "paused":
             self.menu.draw(self.screen, "paused")
         elif self.scene == "gameover":
@@ -744,7 +810,8 @@ class Game:
                            continue_used=self.continue_used,
                            chapters_cleared=self.chapters_cleared,
                            total_chapters=self._total_chapters(),
-                           best_score=self._best_score)
+                           best_score=self._best_score,
+                           is_ex=self._is_ex)
         elif self.scene == "story" and self.campaign:
             self.dialogue_box.draw(self.screen, self.dialogue, self.campaign.characters)
 

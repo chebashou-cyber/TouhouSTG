@@ -147,6 +147,7 @@ BOSS_DEFEAT_DROP_JITTER = 32
 STAGE_TITLE_CARD_TIME = 3.4      # 关卡开场标题卡显示时长 (s)
 CHAPTER_CLEAR_BONUS = 150000     # 每章通过奖励
 ALL_CLEAR_BONUS = 1000000        # 六章全通奖励
+EX_CLEAR_BONUS = 500000          # EX 章通过奖励
 DIALOGUE_LINE_GAP = 0.0          # 台词间停顿 (s), 0 表示按键即翻
 
 # -------------------- 存档 --------------------

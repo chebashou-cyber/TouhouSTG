@@ -1,0 +1,950 @@
+{
+  "name": "EX · 星之残响",
+  "waves": [
+    {
+      "time": 1.5,
+      "enemies": [
+        {
+          "x": -30,
+          "y": 90,
+          "hp": 60,
+          "path": [
+            [
+              0.0,
+              -30,
+              90
+            ],
+            [
+              1.8,
+              150,
+              90
+            ],
+            [
+              4.2,
+              150,
+              90
+            ],
+            [
+              5.800000000000001,
+              150,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "aimed",
+              "color": "purple",
+              "speed": 280,
+              "count": 3,
+              "spread": 0.05,
+              "period": 0.55,
+              "start_t": 0.0
+            }
+          ],
+          "score": 1600
+        },
+        {
+          "x": 670,
+          "y": 150,
+          "hp": 60,
+          "path": [
+            [
+              0.0,
+              670,
+              150
+            ],
+            [
+              1.8,
+              490,
+              150
+            ],
+            [
+              4.2,
+              490,
+              150
+            ],
+            [
+              5.800000000000001,
+              490,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "aimed",
+              "color": "purple",
+              "speed": 280,
+              "count": 3,
+              "spread": 0.05,
+              "period": 0.55,
+              "start_t": 0.0
+            }
+          ],
+          "score": 1600
+        },
+        {
+          "x": -30,
+          "y": 210,
+          "hp": 60,
+          "path": [
+            [
+              0.0,
+              -30,
+              210
+            ],
+            [
+              1.8,
+              170,
+              210
+            ],
+            [
+              4.2,
+              170,
+              210
+            ],
+            [
+              5.800000000000001,
+              170,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "fan",
+              "color": "blue",
+              "speed": 230,
+              "count": 7,
+              "arc": "PI/3",
+              "base_angle": "aimed",
+              "rotate_speed": 0.0,
+              "period": 0.5,
+              "start_t": 0.0
+            }
+          ],
+          "score": 1600
+        }
+      ]
+    },
+    {
+      "time": 10.0,
+      "enemies": [
+        {
+          "x": 180,
+          "y": -40,
+          "hp": 190,
+          "path": [
+            [
+              0.0,
+              180,
+              -40
+            ],
+            [
+              1.8,
+              180,
+              110
+            ],
+            [
+              7.8,
+              180,
+              110
+            ],
+            [
+              9.6,
+              240,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "delayed_ring",
+              "color": "blue",
+              "speed": 220,
+              "count": 6,
+              "split_at": 0.55,
+              "split_count": 4,
+              "split_speed": 170,
+              "period": 0.1,
+              "start_t": 0.0
+            }
+          ],
+          "score": 4600
+        },
+        {
+          "x": 460,
+          "y": -40,
+          "hp": 190,
+          "path": [
+            [
+              0.0,
+              460,
+              -40
+            ],
+            [
+              1.8,
+              460,
+              110
+            ],
+            [
+              7.8,
+              460,
+              110
+            ],
+            [
+              9.6,
+              520,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "delayed_ring",
+              "color": "blue",
+              "speed": 220,
+              "count": 6,
+              "split_at": 0.55,
+              "split_count": 4,
+              "split_speed": 170,
+              "period": 0.1,
+              "start_t": 0.0
+            }
+          ],
+          "score": 4600
+        }
+      ]
+    },
+    {
+      "time": 20.0,
+      "enemies": [
+        {
+          "x": 320,
+          "y": -40,
+          "hp": 320,
+          "path": [
+            [
+              0.0,
+              320,
+              -40
+            ],
+            [
+              1.8,
+              320,
+              120
+            ],
+            [
+              9.8,
+              320,
+              120
+            ],
+            [
+              11.600000000000001,
+              380,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "ring",
+              "color": "yellow",
+              "speed": 210,
+              "count": 24,
+              "base_angle": 0.0,
+              "rotate_speed": 0.7,
+              "speed_jitter": 0.0,
+              "period": 0.45,
+              "start_t": 0.0
+            },
+            {
+              "pattern": "spiral",
+              "color": "purple",
+              "speed": 200,
+              "count": 3,
+              "step_angle": 0.28,
+              "arms": 3,
+              "period": 0.08,
+              "start_t": 0.0
+            }
+          ],
+          "score": 8000
+        }
+      ]
+    },
+    {
+      "time": 32.0,
+      "enemies": [
+        {
+          "x": -30,
+          "y": 100,
+          "hp": 44,
+          "path": [
+            [
+              0.0,
+              -30,
+              100
+            ],
+            [
+              1.8,
+              670,
+              100
+            ],
+            [
+              4.2,
+              670,
+              100
+            ],
+            [
+              5.6,
+              845.0,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "scatter",
+              "color": "red",
+              "speed": 210,
+              "count": 6,
+              "base_angle": "PI/2",
+              "angle_jitter": "PI/4",
+              "rng_seed": 21,
+              "period": 0.45,
+              "start_t": 0.0
+            }
+          ],
+          "score": 1300
+        },
+        {
+          "x": -30,
+          "y": 100,
+          "hp": 44,
+          "path": [
+            [
+              0.0,
+              -30,
+              100
+            ],
+            [
+              1.8,
+              670,
+              100
+            ],
+            [
+              4.2,
+              670,
+              100
+            ],
+            [
+              5.6,
+              845.0,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "scatter",
+              "color": "red",
+              "speed": 210,
+              "count": 6,
+              "base_angle": "PI/2",
+              "angle_jitter": "PI/4",
+              "rng_seed": 21,
+              "period": 0.45,
+              "start_t": 0.0
+            }
+          ],
+          "score": 1310
+        },
+        {
+          "x": -30,
+          "y": 100,
+          "hp": 44,
+          "path": [
+            [
+              0.0,
+              -30,
+              100
+            ],
+            [
+              1.8,
+              670,
+              100
+            ],
+            [
+              4.2,
+              670,
+              100
+            ],
+            [
+              5.6,
+              845.0,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "scatter",
+              "color": "red",
+              "speed": 210,
+              "count": 6,
+              "base_angle": "PI/2",
+              "angle_jitter": "PI/4",
+              "rng_seed": 21,
+              "period": 0.45,
+              "start_t": 0.0
+            }
+          ],
+          "score": 1320
+        },
+        {
+          "x": -30,
+          "y": 100,
+          "hp": 44,
+          "path": [
+            [
+              0.0,
+              -30,
+              100
+            ],
+            [
+              1.8,
+              670,
+              100
+            ],
+            [
+              4.2,
+              670,
+              100
+            ],
+            [
+              5.6,
+              845.0,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "scatter",
+              "color": "red",
+              "speed": 210,
+              "count": 6,
+              "base_angle": "PI/2",
+              "angle_jitter": "PI/4",
+              "rng_seed": 21,
+              "period": 0.45,
+              "start_t": 0.0
+            }
+          ],
+          "score": 1330
+        },
+        {
+          "x": -30,
+          "y": 100,
+          "hp": 44,
+          "path": [
+            [
+              0.0,
+              -30,
+              100
+            ],
+            [
+              1.8,
+              670,
+              100
+            ],
+            [
+              4.2,
+              670,
+              100
+            ],
+            [
+              5.6,
+              845.0,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "scatter",
+              "color": "red",
+              "speed": 210,
+              "count": 6,
+              "base_angle": "PI/2",
+              "angle_jitter": "PI/4",
+              "rng_seed": 21,
+              "period": 0.45,
+              "start_t": 0.0
+            }
+          ],
+          "score": 1340
+        },
+        {
+          "x": -30,
+          "y": 100,
+          "hp": 44,
+          "path": [
+            [
+              0.0,
+              -30,
+              100
+            ],
+            [
+              1.8,
+              670,
+              100
+            ],
+            [
+              4.2,
+              670,
+              100
+            ],
+            [
+              5.6,
+              845.0,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "scatter",
+              "color": "red",
+              "speed": 210,
+              "count": 6,
+              "base_angle": "PI/2",
+              "angle_jitter": "PI/4",
+              "rng_seed": 21,
+              "period": 0.45,
+              "start_t": 0.0
+            }
+          ],
+          "score": 1350
+        }
+      ]
+    },
+    {
+      "time": 42.0,
+      "enemies": [
+        {
+          "x": -30,
+          "y": 120,
+          "hp": 170,
+          "path": [
+            [
+              0.0,
+              -30,
+              120
+            ],
+            [
+              1.8,
+              130,
+              120
+            ],
+            [
+              6.3,
+              130,
+              120
+            ],
+            [
+              7.9,
+              130,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "delayed_fan",
+              "color": "yellow",
+              "speed": 260,
+              "count": 11,
+              "arc": "PI/2",
+              "base_angle": "aimed",
+              "split_at": 0.58,
+              "split_count": 4,
+              "split_speed": 180,
+              "period": 0.46,
+              "start_t": 0.0
+            }
+          ],
+          "score": 3800
+        },
+        {
+          "x": 670,
+          "y": 200,
+          "hp": 170,
+          "path": [
+            [
+              0.0,
+              670,
+              200
+            ],
+            [
+              1.8,
+              510,
+              200
+            ],
+            [
+              6.3,
+              510,
+              200
+            ],
+            [
+              7.9,
+              510,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "delayed_fan",
+              "color": "yellow",
+              "speed": 260,
+              "count": 11,
+              "arc": "PI/2",
+              "base_angle": "aimed",
+              "split_at": 0.58,
+              "split_count": 4,
+              "split_speed": 180,
+              "period": 0.46,
+              "start_t": 0.0
+            }
+          ],
+          "score": 3800
+        }
+      ]
+    },
+    {
+      "time": 53.0,
+      "enemies": [
+        {
+          "x": 240,
+          "y": -40,
+          "hp": 200,
+          "path": [
+            [
+              0.0,
+              240,
+              -40
+            ],
+            [
+              1.8,
+              240,
+              130
+            ],
+            [
+              7.8,
+              240,
+              130
+            ],
+            [
+              9.6,
+              300,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "spiral",
+              "color": "red",
+              "speed": 210,
+              "count": 4,
+              "step_angle": 0.24,
+              "arms": 4,
+              "period": 0.08,
+              "start_t": 0.0
+            }
+          ],
+          "score": 4800
+        },
+        {
+          "x": 400,
+          "y": -40,
+          "hp": 200,
+          "path": [
+            [
+              0.0,
+              400,
+              -40
+            ],
+            [
+              1.8,
+              400,
+              130
+            ],
+            [
+              7.8,
+              400,
+              130
+            ],
+            [
+              9.6,
+              460,
+              -70
+            ]
+          ],
+          "emitters": [
+            {
+              "pattern": "spiral",
+              "color": "red",
+              "speed": 210,
+              "count": 4,
+              "step_angle": -0.24,
+              "arms": 4,
+              "period": 0.08,
+              "start_t": 0.0
+            }
+          ],
+          "score": 4800
+        }
+      ]
+    }
+  ],
+  "bosses": [
+    {
+      "time": 66,
+      "x": 320,
+      "y": -40,
+      "hp": 900,
+      "radius": 26,
+      "label": "Mid",
+      "path": [
+        [
+          0.0,
+          320,
+          -50
+        ],
+        [
+          1.6,
+          320,
+          124
+        ],
+        [
+          13.6,
+          320,
+          124
+        ]
+      ],
+      "score": 220000,
+      "spellcards": [
+        {
+          "no": "Mid",
+          "name": "残响「越走越远的声音」",
+          "duration": 24,
+          "hp_threshold": 0.34,
+          "bonus_score": 300000,
+          "emitters": [
+            {
+              "pattern": "ring",
+              "color": "purple",
+              "speed": 215,
+              "count": 22,
+              "base_angle": 0.0,
+              "rotate_speed": 0.75,
+              "speed_jitter": 0.0,
+              "period": 0.45,
+              "start_t": 0.0
+            },
+            {
+              "pattern": "aimed",
+              "color": "yellow",
+              "speed": 300,
+              "count": 3,
+              "spread": 0.05,
+              "period": 0.3,
+              "start_t": 0.0
+            }
+          ]
+        },
+        {
+          "no": "Mid2",
+          "name": "回符「说过的最后一句话」",
+          "duration": 24,
+          "hp_threshold": 0.36,
+          "bonus_score": 380000,
+          "emitters": [
+            {
+              "pattern": "delayed_fan",
+              "color": "blue",
+              "speed": 260,
+              "count": 11,
+              "arc": "PI/2",
+              "base_angle": "aimed",
+              "split_at": 0.58,
+              "split_count": 4,
+              "split_speed": 175,
+              "period": 0.46,
+              "start_t": 0.0
+            },
+            {
+              "pattern": "spiral",
+              "color": "purple",
+              "speed": 200,
+              "count": 2,
+              "step_angle": -0.32,
+              "arms": 3,
+              "period": 0.08,
+              "start_t": 0.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "time": 102,
+      "x": 320,
+      "y": -50,
+      "hp": 2200,
+      "radius": 34,
+      "label": "Boss",
+      "path": [
+        [
+          0.0,
+          320,
+          -50
+        ],
+        [
+          2.0,
+          320,
+          140
+        ],
+        [
+          14.0,
+          320,
+          140
+        ]
+      ],
+      "score": 320000,
+      "spellcards": [
+        {
+          "no": "1",
+          "name": "残符「尚有余温的光」",
+          "duration": 26,
+          "hp_threshold": 0.26,
+          "bonus_score": 420000,
+          "emitters": [
+            {
+              "pattern": "ring",
+              "color": "yellow",
+              "speed": 220,
+              "count": 28,
+              "base_angle": 0.0,
+              "rotate_speed": 0.4,
+              "speed_jitter": 0.0,
+              "period": 0.44,
+              "start_t": 0.0
+            },
+            {
+              "pattern": "fan",
+              "color": "purple",
+              "speed": 240,
+              "count": 13,
+              "arc": "PI/2",
+              "base_angle": "aimed",
+              "rotate_speed": 0.0,
+              "period": 0.46,
+              "start_t": 0.0
+            }
+          ]
+        },
+        {
+          "no": "2",
+          "name": "响符「回声套着回声」",
+          "duration": 26,
+          "hp_threshold": 0.32,
+          "bonus_score": 620000,
+          "emitters": [
+            {
+              "pattern": "delayed_ring",
+              "color": "blue",
+              "speed": 210,
+              "count": 8,
+              "split_at": 0.55,
+              "split_count": 4,
+              "split_speed": 175,
+              "period": 0.1,
+              "start_t": 0.0
+            },
+            {
+              "pattern": "aimed",
+              "color": "red",
+              "speed": 300,
+              "count": 4,
+              "spread": 0.05,
+              "period": 0.28,
+              "start_t": 0.0
+            }
+          ]
+        },
+        {
+          "no": "3",
+          "name": "熄符「熄灭之前的一秒」",
+          "duration": 28,
+          "hp_threshold": 0.38,
+          "bonus_score": 820000,
+          "emitters": [
+            {
+              "pattern": "ring",
+              "color": "red",
+              "speed": 230,
+              "count": 34,
+              "base_angle": 0.0,
+              "rotate_speed": 0.5,
+              "speed_jitter": 0.0,
+              "period": 0.4,
+              "start_t": 0.0
+            },
+            {
+              "pattern": "spiral",
+              "color": "purple",
+              "speed": 215,
+              "count": 3,
+              "step_angle": 0.3,
+              "arms": 4,
+              "period": 0.075,
+              "start_t": 0.0
+            }
+          ]
+        },
+        {
+          "no": "Final",
+          "name": "终符「谢幕的星屑」",
+          "duration": 32,
+          "hp_threshold": 0.55,
+          "bonus_score": 1400000,
+          "emitters": [
+            {
+              "pattern": "delayed_fan",
+              "color": "yellow",
+              "speed": 270,
+              "count": 15,
+              "arc": "PI/2",
+              "base_angle": "aimed",
+              "split_at": 0.55,
+              "split_count": 5,
+              "split_speed": 185,
+              "period": 0.44,
+              "start_t": 0.0
+            },
+            {
+              "pattern": "ring",
+              "color": "blue",
+              "speed": 200,
+              "count": 30,
+              "base_angle": 0.0,
+              "rotate_speed": -0.35,
+              "speed_jitter": 0.0,
+              "period": 0.5,
+              "start_t": 0.0
+            },
+            {
+              "pattern": "aimed",
+              "color": "red",
+              "speed": 310,
+              "count": 2,
+              "spread": 0.04,
+              "period": 0.26,
+              "start_t": 0.12
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

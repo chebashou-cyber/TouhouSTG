@@ -32,21 +32,14 @@ from config import (
     STAGE_CLEAR_RANK_FINAL, STAGE_CLEAR_RANK_A, STAGE_CLEAR_RANK_B, STAGE_CLEAR_RANK_C,
 )
 
-# 标题光标行
+# 标题光标行 (顺序即上下移动顺序)
 TITLE_ROW_START = 0
 TITLE_ROW_STAGE = 1
-TITLE_ROW_DIFFICULTY = 2
-TITLE_ROW_REPLAY = 3
-TITLE_ROW_QUIT = 4
-TITLE_ROWS = 5
-
-_TITLE_ROW_KEYS = (
-    TITLE_ROW_START,
-    TITLE_ROW_STAGE,
-    TITLE_ROW_DIFFICULTY,
-    TITLE_ROW_REPLAY,
-    TITLE_ROW_QUIT,
-)
+TITLE_ROW_EX = 2
+TITLE_ROW_DIFFICULTY = 3
+TITLE_ROW_REPLAY = 4
+TITLE_ROW_QUIT = 5
+TITLE_ROWS = 6
 
 
 def compute_rank(lives: int, continue_used: int) -> str:
@@ -127,6 +120,8 @@ class MenuSystem:
                 elif self._title_cursor == TITLE_ROW_STAGE:
                     actions.append(("start_practice", self._title_diff_cursor,
                                     self._title_stage_cursor))
+                elif self._title_cursor == TITLE_ROW_EX:
+                    actions.append(("start_ex", self._title_diff_cursor))
                 elif self._title_cursor == TITLE_ROW_DIFFICULTY:
                     actions.append(("set_difficulty", self._title_diff_cursor))
                 elif self._title_cursor == TITLE_ROW_REPLAY:
@@ -139,7 +134,8 @@ class MenuSystem:
             if input.consume_press("escape"):
                 actions.append(("quit",))
             if input.consume_press("r"):
-                actions.append(("restart",))
+                # 暂停里的 R 只重开当前这一关/一章, 不是整局
+                actions.append(("restart_stage",))
             if input.consume_press("enter") or input.consume_press("z"):
                 actions.append(("resume",))
         elif scene == "gameover":
@@ -166,9 +162,11 @@ class MenuSystem:
              stage_id: int = 1,
              best_score: int = 0,
              chapters_cleared: int = 0,
-             total_chapters: int = 0) -> None:
+             total_chapters: int = 0,
+             ex_unlocked: bool = False,
+             is_ex: bool = False) -> None:
         if scene == "title":
-            self._draw_title(surf, best_score)
+            self._draw_title(surf, best_score, ex_unlocked)
         elif scene == "paused":
             self._draw_paused(surf)
         elif scene == "gameover":
@@ -178,7 +176,7 @@ class MenuSystem:
                                   continue_used, stage_id)
         elif scene == "allclear":
             self._draw_allclear(surf, player, difficulty, continue_used,
-                                chapters_cleared, total_chapters, best_score)
+                                chapters_cleared, total_chapters, best_score, is_ex)
 
     # ---- 小工具 ----
     def _center(self, surf, text_surface, y):
@@ -210,121 +208,112 @@ class MenuSystem:
         return x_cursor
 
     # ---- title ----
-    def _draw_title(self, surf, best_score: int = 0):
+    def _draw_title(self, surf, best_score: int = 0, ex_unlocked: bool = False):
         title = self.font_huge.render("TOUHOU-STYLE", True, COLOR_MENU_TITLE)
-        self._center(surf, title, 34)
+        self._center(surf, title, 28)
         sub = self.font_cjk.render("～ 星 屑 异 变 ～", True, COLOR_MENU_ACCENT)
-        self._center(surf, sub, 84)
-        ver = self.font_small.render("v1.0  story campaign  /  6 chapters", True, COLOR_TEXT_DIM)
-        self._center(surf, ver, 108)
+        self._center(surf, sub, 76)
+        ver = self.font_small.render(
+            "v1.0  story campaign  /  6 chapters + EX", True, COLOR_TEXT_DIM)
+        self._center(surf, ver, 100)
 
-        y0 = 146
-        dy = 42
-
-        # START
-        c0 = COLOR_MENU_SEL if self._title_cursor == TITLE_ROW_START else COLOR_MENU_DIM
-        start = self.font_big.render("START", True, c0)
-        surf.blit(start, (SCREEN_W // 2 - 150, y0))
-        if self._title_cursor == TITLE_ROW_START:
-            pygame.draw.polygon(surf, COLOR_MENU_SEL, [
-                (SCREEN_W // 2 - 175, y0 + 8),
-                (SCREEN_W // 2 - 163, y0 + 14),
-                (SCREEN_W // 2 - 175, y0 + 20),
-            ])
-        desc = self.font_cjk_small.render("剧情模式 · 6 章连续闯关", True,
-                                         COLOR_TEXT if self._title_cursor == TITLE_ROW_START
-                                         else COLOR_TEXT_DIM)
-        surf.blit(desc, (SCREEN_W // 2 + 26, y0 + 8))
-
-        # STAGE SELECT
-        y = y0 + dy
-        c1 = COLOR_MENU_SEL if self._title_cursor == TITLE_ROW_STAGE else COLOR_MENU_DIM
-        lbl = self.font_big.render("STAGE", True, c1)
-        surf.blit(lbl, (SCREEN_W // 2 - 150, y))
-        if self._title_cursor == TITLE_ROW_STAGE:
-            pygame.draw.polygon(surf, COLOR_MENU_SEL, [
-                (SCREEN_W // 2 - 175, y + 8),
-                (SCREEN_W // 2 - 163, y + 14),
-                (SCREEN_W // 2 - 175, y + 20),
-            ])
-        sid = self._title_stage_cursor
-        val = self.font_big.render(f"{sid:>2d}", True, COLOR_MENU_ACCENT)
-        surf.blit(val, (SCREEN_W // 2 + 48, y))
+        y0 = 138
+        dy = 38
+        cursor_x = SCREEN_W // 2 - 175
+        label_x = SCREEN_W // 2 - 150
         la = self.font_med.render("<", True, COLOR_MENU_ACCENT)
         ra = self.font_med.render(">", True, COLOR_MENU_ACCENT)
+
+        def arrow(y_pos):
+            pygame.draw.polygon(surf, COLOR_MENU_SEL, [
+                (cursor_x, y_pos + 8), (cursor_x + 12, y_pos + 14),
+                (cursor_x, y_pos + 20),
+            ])
+
+        def label(y_pos, text, focused, color=None):
+            c = color or (COLOR_MENU_SEL if focused else COLOR_MENU_DIM)
+            surf.blit(self.font_big.render(text, True, c), (label_x, y_pos))
+            if focused:
+                arrow(y_pos)
+
+        def desc(y_pos, text, focused, color=None):
+            c = color or (COLOR_TEXT if focused else COLOR_TEXT_DIM)
+            surf.blit(self.font_cjk_small.render(text, True, c),
+                      (SCREEN_W // 2 + 26, y_pos + 8))
+
+        # 0 START
+        y = y0
+        f = self._title_cursor == TITLE_ROW_START
+        label(y, "START", f)
+        desc(y, "剧情模式 · 6 章连续闯关", f)
+
+        # 1 STAGE
+        y = y0 + dy
+        f = self._title_cursor == TITLE_ROW_STAGE
+        label(y, "STAGE", f)
+        sid = self._title_stage_cursor
+        surf.blit(self.font_big.render(f"{sid:>2d}", True, COLOR_MENU_ACCENT),
+                  (SCREEN_W // 2 + 48, y))
         surf.blit(la, (SCREEN_W // 2 + 28, y + 6))
         surf.blit(ra, (SCREEN_W // 2 + 84, y + 6))
-        label = STAGE_LABELS.get(sid, "?")
-        st = self.font_cjk_small.render(label, True,
-                                       COLOR_TEXT if self._title_cursor == TITLE_ROW_STAGE
-                                       else COLOR_TEXT_DIM)
-        surf.blit(st, (SCREEN_W // 2 + 104, y + 8))
+        surf.blit(self.font_cjk_small.render(
+            STAGE_LABELS.get(sid, "?"), True,
+            COLOR_TEXT if f else COLOR_TEXT_DIM), (SCREEN_W // 2 + 104, y + 8))
 
-        # DIFFICULTY
+        # 2 EX (通关本篇后解锁)
         y = y0 + dy * 2
-        c2 = COLOR_MENU_SEL if self._title_cursor == TITLE_ROW_DIFFICULTY else COLOR_MENU_DIM
-        lbl = self.font_big.render("DIFFICULTY", True, c2)
-        surf.blit(lbl, (SCREEN_W // 2 - 150, y))
-        if self._title_cursor == TITLE_ROW_DIFFICULTY:
-            pygame.draw.polygon(surf, COLOR_MENU_SEL, [
-                (SCREEN_W // 2 - 175, y + 8),
-                (SCREEN_W // 2 - 163, y + 14),
-                (SCREEN_W // 2 - 175, y + 20),
-            ])
-        dval = self.font_big.render(DIFFICULTY_NAMES[self._title_diff_cursor], True,
-                                    COLOR_MENU_ACCENT)
+        f = self._title_cursor == TITLE_ROW_EX
+        if ex_unlocked:
+            label(y, "EXTRA", f)
+            desc(y, "EX 章 · 星之残响（已解锁）", f, (255, 220, 150) if f else (200, 190, 150))
+        else:
+            label(y, "EXTRA", False, (70, 70, 85))
+            surf.blit(self.font_cjk_small.render("通关本篇后解锁", True, (80, 80, 100)),
+                      (SCREEN_W // 2 + 26, y + 8))
+            if f:
+                arrow(y)
+
+        # 3 DIFFICULTY
+        y = y0 + dy * 3
+        f = self._title_cursor == TITLE_ROW_DIFFICULTY
+        label(y, "DIFFICULTY", f)
+        dval = self.font_big.render(DIFFICULTY_NAMES[self._title_diff_cursor],
+                                    True, COLOR_MENU_ACCENT)
         surf.blit(dval, (SCREEN_W // 2 + 48, y))
         surf.blit(la, (SCREEN_W // 2 + 28, y + 6))
         surf.blit(ra, (SCREEN_W // 2 + 54 + dval.get_width(), y + 6))
 
-        # REPLAY
-        y = y0 + dy * 3
-        c3 = COLOR_MENU_SEL if self._title_cursor == TITLE_ROW_REPLAY else COLOR_MENU_DIM
-        rp = self.font_big.render("REPLAY", True, c3)
-        surf.blit(rp, (SCREEN_W // 2 - 150, y))
-        if self._title_cursor == TITLE_ROW_REPLAY:
-            pygame.draw.polygon(surf, COLOR_MENU_SEL, [
-                (SCREEN_W // 2 - 175, y + 8),
-                (SCREEN_W // 2 - 163, y + 14),
-                (SCREEN_W // 2 - 175, y + 20),
-            ])
-        rd = self.font_cjk_small.render("播放最新录像", True,
-                                       COLOR_TEXT if self._title_cursor == TITLE_ROW_REPLAY
-                                       else COLOR_TEXT_DIM)
-        surf.blit(rd, (SCREEN_W // 2 + 26, y + 8))
-
-        # QUIT
+        # 4 REPLAY
         y = y0 + dy * 4
-        c4 = COLOR_MENU_SEL if self._title_cursor == TITLE_ROW_QUIT else COLOR_MENU_DIM
-        q = self.font_big.render("QUIT", True, c4)
-        surf.blit(q, (SCREEN_W // 2 - 150, y))
-        if self._title_cursor == TITLE_ROW_QUIT:
-            pygame.draw.polygon(surf, COLOR_MENU_SEL, [
-                (SCREEN_W // 2 - 175, y + 8),
-                (SCREEN_W // 2 - 163, y + 14),
-                (SCREEN_W // 2 - 175, y + 20),
-            ])
+        f = self._title_cursor == TITLE_ROW_REPLAY
+        label(y, "REPLAY", f)
+        desc(y, "播放最新录像", f)
+
+        # 5 QUIT
+        y = y0 + dy * 5
+        label(y, "QUIT", self._title_cursor == TITLE_ROW_QUIT)
 
         # 最高分
         best = self.font_cjk_small.render(
             f"BEST  {_fmt_score(best_score)}   ({DIFFICULTY_NAMES[self._title_diff_cursor]})",
             True, (255, 230, 150))
-        self._center(surf, best, 358)
+        self._center(surf, best, 362)
 
         if int(self._t * 2) % 2 == 0:
-            h = self.font_cjk_small.render("Enter / Z : 确认      ↑↓ 选择      ←→ 调整", True, COLOR_TEXT)
-            self._center(surf, h, 384)
+            h = self.font_cjk_small.render(
+                "Enter / Z : 确认      ↑↓ 选择      ←→ 调整", True, COLOR_TEXT)
+            self._center(surf, h, 386)
 
         ops = self.font_small.render(
             "Arrows/WASD Move   Shift Focus   Z Fire   X Bomb   P Pause",
             True, COLOR_TEXT_DIM,
         )
-        self._center(surf, ops, 410)
+        self._center(surf, ops, 412)
         ops2 = self.font_small.render(
             "F1 Debug   F2 Step   F3 God   F4 Clear   Esc Quit",
             True, COLOR_TEXT_DIM,
         )
-        self._center(surf, ops2, 430)
+        self._center(surf, ops2, 432)
 
     # ---- paused ----
     def _draw_paused(self, surf):
@@ -396,13 +385,15 @@ class MenuSystem:
 
     # ---- allclear ----
     def _draw_allclear(self, surf, player, difficulty, continue_used,
-                       chapters_cleared, total_chapters, best_score):
+                       chapters_cleared, total_chapters, best_score, is_ex=False):
         s = pygame.Surface((SCREEN_W, SCREEN_H), pygame.SRCALPHA)
         s.fill((0, 0, 12, 205))
         surf.blit(s, (0, 0))
-        t = self.font_huge.render("ALL CLEAR", True, (255, 240, 130))
+        t = self.font_huge.render("EX CLEAR" if is_ex else "ALL CLEAR", True,
+                                  (255, 240, 130))
         self._center(surf, t, 56)
-        sub = self.font_cjk.render("星屑异变 · 解决", True, (180, 220, 255))
+        sub = self.font_cjk.render("星之残响 · 消散" if is_ex else "星屑异变 · 解决",
+                                   True, (180, 220, 255))
         self._center(surf, sub, 112)
 
         score = self.font_big.render(f"SCORE  {_fmt_score(player.score if player else 0)}",
