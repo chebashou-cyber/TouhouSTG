@@ -248,6 +248,7 @@ def ex_chapter_run():
     # 未通关时不可进
     game._start_ex(difficulty=1)
     assert game.scene == "title", "未解锁时不该进入 EX 章"
+    assert game._title_notice_t > 0, "未解锁时应给出画面提示"
     assert not game._ex_unlocked(), "初次启动时 EX 不应解锁"
 
     # 伪造一次全通 -> 解锁

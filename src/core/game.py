@@ -129,6 +129,10 @@ class Game:
         self._title_card_sub = ""
         self._boss_intro_played = False
         self._chapter_font = get_font(12, cjk=True)
+        # 标题画面上的临时提示 (例如点了未解锁的 EX 章)
+        self._title_notice = ""
+        self._title_notice_t = 0.0
+        self._notice_font = get_font(14, cjk=True)
 
         # ---- 存档 / 进度 ----
         self.save = SaveData()
@@ -202,6 +206,8 @@ class Game:
 
             self.menu.update(LOGIC_DT)
             self.hud.update_announce(LOGIC_DT)
+            if self._title_notice_t > 0:
+                self._title_notice_t -= LOGIC_DT
 
             tick_ms = self.clock.tick(0)
             dt = min(tick_ms / 1000.0, MAX_FRAME_DT) if tick_ms > 0 else LOGIC_DT
@@ -306,6 +312,10 @@ class Game:
         }
         self._begin_chapter()
 
+    def _set_title_notice(self, text: str, seconds: float = 2.5) -> None:
+        self._title_notice = text
+        self._title_notice_t = seconds
+
     def _ex_unlocked(self) -> bool:
         """EX 章解锁条件: 本篇至少全通一次 (任意难度)。"""
         return (self.campaign is not None
@@ -315,7 +325,7 @@ class Game:
     def _start_ex(self, difficulty: int) -> None:
         """EX 章: 单章剧情, 打完直接 EX CLEAR, 不播本篇结局。"""
         if not self._ex_unlocked():
-            print("[story] EX 章未解锁: 需要先通关本篇一次")
+            self._set_title_notice("先通关本篇一次，才能进入 EX 章")
             return
         ex = self.campaign.ex_chapter
         assert ex is not None
@@ -790,8 +800,13 @@ class Game:
             self._render_world()
 
         if self.scene == "title":
+            # BEST 跟着难度光标实时变, 不能只在切场景时刷新
+            self._best_score = self.save.best_score(self.menu._title_diff_cursor)
             self.menu.draw(self.screen, "title", best_score=self._best_score,
                            ex_unlocked=self._ex_unlocked())
+            if self._title_notice_t > 0 and self._title_notice:
+                t = self._notice_font.render(self._title_notice, True, (255, 180, 160))
+                self.screen.blit(t, ((SCREEN_W - t.get_width()) // 2, 462))
         elif self.scene == "paused":
             self.menu.draw(self.screen, "paused")
         elif self.scene == "gameover":
