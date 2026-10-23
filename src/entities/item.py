@@ -16,6 +16,7 @@
 from __future__ import annotations
 import math
 import pygame
+from src.ui.fonts import get_font
 from config import (
     SCREEN_H, SCREEN_W,
     ITEM_FALL_SPEED, ITEM_ATTRACT_SPEED_MIN, ITEM_ATTRACT_SPEED_MAX,
@@ -137,7 +138,7 @@ class Item:
         pygame.draw.circle(surf, color, (int(self.x), int(self.y)), ITEM_RADIUS, 0)
         pygame.draw.circle(surf, (255, 255, 255), (int(self.x), int(self.y)), ITEM_RADIUS, 1)
         if font is None:
-            font = pygame.font.SysFont("consolas", 10, bold=True)
+            font = get_font(10, bold=True)
         s = font.render(item_label(self.kind), True, (20, 20, 20))
         surf.blit(s, (self.x - s.get_width() / 2, self.y - s.get_height() / 2))
 
@@ -150,7 +151,7 @@ class ItemPool:
     def __init__(self, initial: int = 256) -> None:
         self._free: list[Item] = [Item(0, 0, TYPE_POWER) for _ in range(initial)]
         self._active: list[Item] = []
-        self._font = pygame.font.SysFont("consolas", 10, bold=True)
+        self._font = get_font(10, bold=True)
 
     def spawn(self, x: float, y: float, kind: int, value: int = 1) -> Item:
         item = self._free.pop() if self._free else Item(0, 0, TYPE_POWER)

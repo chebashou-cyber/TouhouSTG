@@ -137,11 +137,16 @@ def check_imports(files: list[str], modules: dict) -> list[str]:
             for n in node.names:
                 if n.name == "*":
                     continue
-                if n.name not in tgt["names"]:
-                    rel = os.path.relpath(f, ROOT).replace(os.sep, "/")
-                    errors.append(
-                        f"{rel}: from {mod} import {n.name}  -> name not defined in '{target_key}'"
-                    )
+                if n.name in tgt["names"]:
+                    continue
+                # `from package import submodule` 是合法写法:
+                # 名字本身可能就是 package 下的一个模块 (src/core/game.py)
+                if target_key != "config" and f"{target_key}/{n.name}" in modules:
+                    continue
+                rel = os.path.relpath(f, ROOT).replace(os.sep, "/")
+                errors.append(
+                    f"{rel}: from {mod} import {n.name}  -> name not defined in '{target_key}'"
+                )
     return errors
 
 

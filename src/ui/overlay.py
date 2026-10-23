@@ -9,6 +9,7 @@
 """
 from __future__ import annotations
 import pygame
+from src.ui.fonts import get_font
 from config import (
     SCREEN_W, SCREEN_H,
     PLAYER_HITBOX_RADIUS, PLAYER_GRAZE_RADIUS,
@@ -20,8 +21,8 @@ class DebugOverlay:
     __slots__ = ("_font", "_font_small")
 
     def __init__(self) -> None:
-        self._font = pygame.font.SysFont("consolas", 14)
-        self._font_small = pygame.font.SysFont("consolas", 12)
+        self._font = get_font(14)
+        self._font_small = get_font(12)
 
     def draw(self, surf: pygame.Surface, player, pool, enemies, fps: float,
              paused: bool, frame_step_request: bool, god_mode: bool) -> None:

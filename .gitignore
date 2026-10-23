@@ -5,3 +5,5 @@ replay/
 build/
 dist/
 *.egg-info/
+.dsh-meow/
+save/

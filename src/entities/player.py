@@ -178,13 +178,26 @@ class Player:
             return
         if not self.draw_flicker_on:
             return
-        # 炸弹时改机身颜色 (蓝/白交替)
-        body_color = (220, 240, 255) if (int(self.bomb_time * 12) % 2 == 0) else COLOR_PLAYER
+        # 炸弹时改机身颜色 (蓝/白交替); 平时保持蓝色机身
+        # 注意: bomb_time 常量为 0 时 int(0*12)%2 == 0, 旧写法会让机身一直是白色
+        if self.bomb_time > 0.0 and int(self.bomb_time * 12) % 2 == 0:
+            body_color = (220, 240, 255)
+        else:
+            body_color = COLOR_PLAYER
+        # 机身: 带机翼的箭形 (纯三角看起来像光标, 加两翼更像自机)
         pygame.draw.polygon(surf, body_color, [
-            (self.x, self.y - 10),
-            (self.x - 7, self.y + 8),
-            (self.x + 7, self.y + 8),
+            (self.x, self.y - 11),
+            (self.x - 4, self.y - 1),
+            (self.x - 11, self.y + 7),
+            (self.x - 4, self.y + 6),
+            (self.x, self.y + 9),
+            (self.x + 4, self.y + 6),
+            (self.x + 11, self.y + 7),
+            (self.x + 4, self.y - 1),
         ])
+        # 座舱
+        pygame.draw.circle(surf, (235, 250, 255),
+                           (int(self.x), int(self.y - 2)), 2)
         flame_h = 6 + (3 if (int(pygame.time.get_ticks() / 60) % 2 == 0) else 0)
         pygame.draw.polygon(surf, (255, 200, 120), [
             (self.x - 3, self.y + 6),

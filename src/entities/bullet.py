@@ -55,12 +55,15 @@ def _out_of_bounds(x: float, y: float, r: float) -> bool:
 class BulletPool:
     """敌弹 / 自机弹共用池。active 与 free 双列表, swap-and-pop 回收。"""
 
-    __slots__ = ("_free", "_active", "_sprite_cache")
+    __slots__ = ("_free", "_active", "_sprite_cache", "_dither_ok")
 
     def __init__(self, initial: int = BULLET_POOL_INITIAL) -> None:
         self._free: list[Bullet] = [Bullet() for _ in range(initial)]
         self._active: list[Bullet] = []
         self._sprite_cache: dict[tuple, pygame.Surface] = {}
+        # pygame < 2.1.3 (以及部分 pygame-ce 构建) 的 blits() 不接受 dither 参数,
+        # 检测一次并记住, 免得每组子弹每帧都靠抛 TypeError 来试错。
+        self._dither_ok: bool | None = None
 
     # ------- spawn -------
     def acquire(
@@ -186,13 +189,34 @@ class BulletPool:
         return sum(1 for b in self._active if b.kind == KIND_ENEMY)
 
     # ------- render -------
+    @staticmethod
+    def _lighten(color: tuple, k: float = 0.55) -> tuple:
+        return (min(255, int(color[0] + (255 - color[0]) * k)),
+                min(255, int(color[1] + (255 - color[1]) * k)),
+                min(255, int(color[2] + (255 - color[2]) * k)))
+
     def _sprite(self, color: tuple, radius: int) -> pygame.Surface:
+        """生成一颗子弹贴图。
+
+        为什么不用 pygame.draw.circle 直接画在小面上:
+        pygame-ce 2.6.1 对 radius <= 4 的圆会光栅化成「十字 / 齿轮」,
+        300 颗弹幕看起来像一堆小星星而不是圆弹。
+        这里用 4 倍尺寸画圆再 smoothscale 下来, 得到平滑的圆 + 轻微抗锯齿。
+        """
         key = (color, radius)
         s = self._sprite_cache.get(key)
         if s is None:
             size = radius * 2 + 2
-            s = pygame.Surface((size, size), pygame.SRCALPHA)
-            pygame.draw.circle(s, color, (size // 2, size // 2), radius)
+            ss = 4
+            big = pygame.Surface((size * ss, size * ss), pygame.SRCALPHA)
+            cx = cy = size * ss // 2
+            pygame.draw.circle(big, color, (cx, cy), radius * ss)
+            # 左上高光, 让弹幕在纯黑背景上有立体感
+            hi_r = max(1, int(radius * ss * 0.38))
+            pygame.draw.circle(big, self._lighten(color),
+                               (cx - int(radius * ss * 0.28),
+                                cy - int(radius * ss * 0.28)), hi_r)
+            s = pygame.transform.smoothscale(big, (size, size))
             self._sprite_cache[key] = s
         return s
 
@@ -210,9 +234,14 @@ class BulletPool:
             ox = s.get_width() // 2
             oy = s.get_height() // 2
             payload = [(s, (b.x - ox, b.y - oy)) for b in bullets]
-            try:
+            if self._dither_ok is None:
+                try:
+                    surf.blits([], dither=False)
+                    self._dither_ok = True
+                except TypeError:
+                    self._dither_ok = False
+            if self._dither_ok:
                 surf.blits(payload, dither=False)
-            except TypeError:
-                # pygame <2.1.3 不支持 dither 参数
+            else:
                 surf.blits(payload)
 

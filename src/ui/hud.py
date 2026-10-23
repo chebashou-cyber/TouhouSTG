@@ -5,10 +5,11 @@
   Lives / Bombs / Power / Score / Graze / Difficulty / Continue
   + (有 Boss 时) Boss 血条 / 符卡名 / 倒计时
   + (符卡开始瞬间) 宣言文字淡入淡出
-字体: SysFont("consolas"), 数字英文稳定。
+字体: ui/fonts.get_font (直接指定字体文件, 规避 SysFont 的系统字体枚举崩溃)。
 """
 from __future__ import annotations
 import pygame
+from src.ui.fonts import get_font
 from config import (
     SCREEN_W, SCREEN_H, PLAYER_MAX_POWER,
     COLOR_TEXT, COLOR_TEXT_DIM,
@@ -23,9 +24,9 @@ class HUD:
                "_spell_name", "_spell_timer", "_spell_total")
 
     def __init__(self) -> None:
-        self._font = pygame.font.SysFont("consolas", 16)
-        self._font_big = pygame.font.SysFont("consolas", 20, bold=True)
-        self._font_small = pygame.font.SysFont("consolas", 12)
+        self._font = get_font(16)
+        self._font_big = get_font(20, bold=True, cjk=True)
+        self._font_small = get_font(12, cjk=True)
         self._spell_alpha = 0.0  # 符卡宣言淡入淡出 alpha (0~255)
 
     def set_spell_announce(self, name: str, t_remaining: float = 2.5) -> None:
@@ -93,7 +94,7 @@ class HUD:
         if boss is not None and boss.is_active():
             self._draw_boss_hud(surf, boss)
 
-        # 状态角标 (右下)
+        # 状态角标 (右下, 提示条上方)
         flags = []
         if paused:
             flags.append("PAUSED")
@@ -105,17 +106,17 @@ class HUD:
             flags.append("BOMB")
         if flags:
             t = self._font_small.render(" ".join(flags), True, (255, 220, 120))
-            surf.blit(t, (SCREEN_W - t.get_width() - 8, SCREEN_H - t.get_height() - 6))
+            surf.blit(t, (SCREEN_W - t.get_width() - 8, SCREEN_H - 30))
 
-        # FPS (左下)
+        # FPS (左下, 提示条上方)
         fps_text = self._font_small.render(f"{fps:>5.1f} FPS", True, COLOR_TEXT_DIM)
-        surf.blit(fps_text, (8, SCREEN_H - fps_text.get_height() - 6))
+        surf.blit(fps_text, (8, SCREEN_H - 30))
 
-        # 底部提示条
-        hints = ("Arrows/WASD Move   Shift Focus   Z Fire   X Bomb"
-                 "   F1 Debug   F2 Step   F3 God   F4 Clear   P Pause")
+        # 底部提示条 (最底一行, 独占, 不再被 FPS/角标覆盖)
+        hints = ("Move   Shift Focus   Z Fire   X Bomb"
+                 "   F1 Debug   F3 God   F4 Clear   P Pause")
         h = self._font_small.render(hints, True, COLOR_TEXT_DIM)
-        surf.blit(h, ((SCREEN_W - h.get_width()) // 2, SCREEN_H - h.get_height() - 6))
+        surf.blit(h, ((SCREEN_W - h.get_width()) // 2, SCREEN_H - h.get_height() - 4))
 
         # 符卡宣言淡入淡出
         if self._spell_alpha > 0 and hasattr(self, "_spell_name"):
@@ -126,7 +127,13 @@ class HUD:
         bar_w = 360
         bar_h = 10
         bx = (SCREEN_W - bar_w) // 2
-        by = 4
+        by = 6
+
+        # 血条下方一条黑色半透明底板, 保证符卡名在亮弹幕上也能读
+        panel = pygame.Surface((bar_w, 20), pygame.SRCALPHA)
+        panel.fill((0, 0, 0, 130))
+        surf.blit(panel, (bx, by + bar_h))
+
         pygame.draw.rect(surf, COLOR_BOSS_HP_BAR_BG, (bx, by, bar_w, bar_h), 0)
         if boss.state == "between":
             fw = bar_w
@@ -139,23 +146,19 @@ class HUD:
         name = boss.get_spell_name()
         if name:
             t_name = self._font_small.render(name, True, COLOR_SPELL_CARD_NAME)
-            surf.blit(t_name, (bx, by + bar_h + 2))
-        # 倒计时 (左下角)
+            surf.blit(t_name, (bx + 4, by + bar_h + 3))
         time_left = max(0.0, (boss.current_spell.duration - boss.spell_timer)
                         if boss.current_spell else 0.0)
         color = COLOR_SPELL_TIMER_WARN if time_left < 5.0 else COLOR_SPELL_TIMER_OK
-        t_time = self._font_small.render(
-            f"{time_left:>4.1f}s", True, color
-        )
-        surf.blit(t_time, (bx + bar_w - t_time.get_width(), by + bar_h + 2))
+        t_time = self._font_small.render(f"{time_left:>4.1f}s", True, color)
+        surf.blit(t_time, (bx + bar_w - t_time.get_width() - 4, by + bar_h + 3))
 
-        # 符卡进度 (X/1, X/2, X/3)
+        # 符卡进度 (X/N)
         idx = boss.current_spell_index + 1
         total = len(boss.spellcards)
-        t_idx = self._font_small.render(
-            f"[{idx}/{total}]", True, COLOR_TEXT_DIM
-        )
-        surf.blit(t_idx, (bx + bar_w - t_idx.get_width() - 60, by + bar_h + 2))
+        t_idx = self._font_small.render(f"[{idx}/{total}]", True, COLOR_TEXT_DIM)
+        surf.blit(t_idx, (bx + bar_w - t_idx.get_width() - t_time.get_width() - 12,
+                          by + bar_h + 3))
 
     def _draw_spell_announce(self, surf: pygame.Surface, name: str) -> None:
         alpha = int(max(0.0, min(255.0, self._spell_alpha)))
