@@ -581,7 +581,7 @@ def stage_ch7():
                 ring("red", 230, 34, rotate_speed=0.5, period=0.4),
                 spiral("purple", 215, 3, 0.3, arms=4, period=0.075),
             ]),
-            spell("Final", "终符「谢幕的星屑」", 32, 0.55, 1400000, [
+            spell("Final", "终符「谢幕的星屑」", 32, 0.42, 1400000, [
                 delayed_fan("yellow", 270, 15, "PI/2", "aimed", 0.55, 5, 185, period=0.44),
                 ring("blue", 200, 30, rotate_speed=-0.35, period=0.5),
                 aimed("red", 310, 2, 0.04, period=0.26, start_t=0.12),

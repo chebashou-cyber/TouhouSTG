@@ -137,9 +137,10 @@ game/
 └── tools/
     ├── check_ast.py          静态检查 (语法 + import 链 + JSON)
     ├── smoke_test.py         模块级冒烟测试 (真 pygame, dummy 驱动)
-    ├── story_smoke.py        剧情模式端到端测试 (六章跑通到 ALL CLEAR)
+    ├── story_smoke.py        剧情模式端到端测试 (六章跑通到 ALL CLEAR + EX)
+    ├── balance_check.py      符卡可击破性检查 (需求伤害 vs 时限内理论伤害)
     ├── capture_shots.py      无头截图
-    ├── gen_stages.py         生成六章关卡数据
+    ├── gen_stages.py         生成七章关卡数据
     └── build.bat / build.sh  PyInstaller 打包
 ```
 
@@ -151,6 +152,7 @@ game/
 python tools\check_ast.py      # 静态检查：语法 / import 链 / JSON 合法性
 python tools\smoke_test.py     # 模块冒烟：对象池、弹幕模式、Replay、UI
 python tools\story_smoke.py    # 端到端：六章连续闯关 + EX 章 + 压力测试
+python tools\balance_check.py  # 符卡可击破性：需求伤害 vs 时限内理论伤害
 ```
 
 `story_smoke.py` 会真的跑完整流程：自动跳过所有对话、秒杀每个 Boss，
@@ -161,6 +163,11 @@ python tools\story_smoke.py    # 端到端：六章连续闯关 + EX 章 + 压�
 它把存档重定向到临时目录，不会污染 `save/records.json`。
 
 三个脚本的退出码都是 `0` 通过 / `1` 失败，可直接接 CI。
+
+`balance_check.py` 是设计期的护栏：按玩家理论 DPS（满火力 3 发 / 0.08s = 37.5）
+逐张算符卡「需要打掉的伤害 / 时限内能打出的伤害」。比值 > 1 的符卡玩家永远只能
+超时，拿不到 bonus——这种错误游戏不会报错，手测也很难发现。当前 39 张符卡全部可击破，
+最紧的是终章 Final（0.83）。
 
 ## 打包
 
@@ -220,6 +227,8 @@ bash tools/build.sh    # Linux / macOS
 - **关卡**：新增七章主线和 8 种编队模式，Boss 符卡从 2~3 张提升到 3~6 张
 - **存档**：`save/records.json` 记录各难度最高分与全通次数，标题画面显示 BEST
 - **音效**：11 种程序化音效（代码合成，无音频文件），M 键静音
+- **平衡护栏**：`tools/balance_check.py` 按理论 DPS 检查每张符卡能否在时限内打破
+  （曾检出 EX 章终符需求 1210 伤害、时限内只有 1200，已调整）
 - **修 bug**：
   - `pygame.font.SysFont` 在部分 Windows 机器上直接抛 `TypeError`，游戏起不来 —— 改为直接指定字体文件，并接入中文字体
   - pygame-ce 2.6.1 下小半径圆形被光栅化成「十字/齿轮」，弹幕看起来像小星星 —— 改为 4 倍超采样

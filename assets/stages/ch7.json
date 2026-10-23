@@ -906,7 +906,7 @@
           "no": "Final",
           "name": "终符「谢幕的星屑」",
           "duration": 32,
-          "hp_threshold": 0.55,
+          "hp_threshold": 0.42,
           "bonus_score": 1400000,
           "emitters": [
             {
