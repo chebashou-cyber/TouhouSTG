@@ -60,7 +60,8 @@ class Player:
         self.draw_flicker_on = True
 
     # ---------- 主循环 ----------
-    def update(self, dt: float, input: InputManager, pool: BulletPool) -> None:
+    def update(self, dt: float, input: InputManager, pool: BulletPool,
+               audio=None) -> None:
         if not self.alive:
             self.death_timer += dt
             if self.death_timer >= DEATH_RESPAWN_DELAY:
@@ -99,14 +100,16 @@ class Player:
         if input.is_held("z"):
             self.fire_cooldown -= dt
             if self.fire_cooldown <= 0.0:
-                self._fire(pool)
+                self._fire(pool, audio)
                 self.fire_cooldown = PLAYER_FIRE_INTERVAL
 
         # 炸弹 (X 触发一次性按下)
         if input.was_pressed("x"):
-            self.use_bomb(pool)
+            self.use_bomb(pool, audio)
 
-    def _fire(self, pool: BulletPool) -> None:
+    def _fire(self, pool: BulletPool, audio=None) -> None:
+        if audio is not None:
+            audio.play("shoot")
         pool.acquire(self.x, self.y - 10,
                      0.0, -PLAYER_FIRE_SPEED * PLAYER_BULLET_SPEED_SCALE,
                      radius=4, color=(120, 255, 140), kind=KIND_PLAYER)
@@ -143,12 +146,14 @@ class Player:
         return True
 
     # ---------- 炸弹 ----------
-    def use_bomb(self, pool: BulletPool) -> int:
+    def use_bomb(self, pool: BulletPool, audio=None) -> int:
         """使用炸弹: 清屏 + 无敌 + 加分。返回清掉的敌弹数量。"""
         if self.bombs <= 0 or not self.alive:
             return 0
         self.bombs -= 1
         self.bomb_time = BOMB_INVULN_TIME
+        if audio is not None:
+            audio.play("bomb")
         removed = pool.clear_enemy()
         bonus = min(removed * BOMB_CLEAR_BULLET_SCORE, BOMB_CLEAR_BULLET_SCORE_CAP)
         self.score += bonus

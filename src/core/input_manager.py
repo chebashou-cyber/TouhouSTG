@@ -20,6 +20,7 @@ _PYGAME_KEYMAP = {
     pygame.K_F1: "f1", pygame.K_F2: "f2", pygame.K_F3: "f3", pygame.K_F4: "f4",
     pygame.K_p: "pause", pygame.K_ESCAPE: "escape",
     pygame.K_RETURN: "enter", pygame.K_SPACE: "space",
+    pygame.K_m: "mute",
 }
 
 

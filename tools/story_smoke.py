@@ -205,6 +205,35 @@ def title_and_menus():
 check("标题/暂停/GameOver/StageClear 画面渲染", title_and_menus)
 
 
+# ---------------------------------------------------------------- 5b. 音效
+def audio_smoke():
+    """程序化音效: 每个音都能生成并播放, 静音开关有效, 无声卡时降级。"""
+    from src.core import audio as audio_mod
+    game = game_mod.Game()
+    au = game.audio
+    assert isinstance(au, audio_mod.Audio)
+    # 逐个生成 (不管混音器是否可用, 生成逻辑本身不该抛异常)
+    for name in audio_mod._RECIPES:
+        au._sounds.pop(name, None)
+        snd = au._build(name)
+        assert snd is not None, f"音效 {name} 生成失败"
+    # 播放 / 节流 / 静音
+    au.enabled = True
+    au.muted = False
+    for name in audio_mod._RECIPES:
+        au.play(name)
+        au._last.pop(name, None)
+    au.muted = True
+    au.play("shoot")
+    assert au.muted
+    au.toggle_mute()
+    assert not au.muted
+    print(f"     音效 {len(audio_mod._RECIPES)} 种全部可生成; muted 开关有效")
+
+
+check("音效: 程序化生成 + 播放 + 静音开关", audio_smoke)
+
+
 # ---------------------------------------------------------------- 6. 暂停重开本章
 def pause_restart_chapter():
     """暂停里的 R 只能重开当前章, 不能把整局重来。"""

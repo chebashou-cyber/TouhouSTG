@@ -55,7 +55,7 @@ class HUD:
     def draw(self, surf: pygame.Surface, player, fps: float, paused: bool,
              frame_step_request: bool, god_mode: bool,
              difficulty: int = 1, continue_left: int = CONTINUE_MAX,
-             bomb_active: bool = False, boss=None) -> None:
+             bomb_active: bool = False, boss=None, muted: bool = False) -> None:
         # 顶部左
         surf.blit(self._font.render(f"LIVES  {player.lives}", True, COLOR_TEXT), (8, 8))
         surf.blit(self._font.render(f"BOMBS  {player.bombs}", True, COLOR_TEXT), (8, 24))
@@ -104,6 +104,8 @@ class HUD:
             flags.append("GOD")
         if bomb_active:
             flags.append("BOMB")
+        if muted:
+            flags.append("MUTE")
         if flags:
             t = self._font_small.render(" ".join(flags), True, (255, 220, 120))
             surf.blit(t, (SCREEN_W - t.get_width() - 8, SCREEN_H - 30))
@@ -113,8 +115,8 @@ class HUD:
         surf.blit(fps_text, (8, SCREEN_H - 30))
 
         # 底部提示条 (最底一行, 独占, 不再被 FPS/角标覆盖)
-        hints = ("Move   Shift Focus   Z Fire   X Bomb"
-                 "   F1 Debug   F3 God   F4 Clear   P Pause")
+        hints = ("Move   Shift Focus   Z Fire   X Bomb   P Pause"
+                 "   M Mute   F1 Debug   F3 God   F4 Clear")
         h = self._font_small.render(hints, True, COLOR_TEXT_DIM)
         surf.blit(h, ((SCREEN_W - h.get_width()) // 2, SCREEN_H - h.get_height() - 4))
 

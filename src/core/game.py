@@ -28,6 +28,7 @@ import pygame
 
 from src.core.input_manager import InputManager
 from src.core.assets import AssetLoader, default_loader
+from src.core.audio import default_audio
 from src.core.replay import ReplayRecorder, ReplayPlayer
 from src.core.save_data import SaveData
 from src.entities.bullet import BulletPool, KIND_ENEMY, KIND_PLAYER
@@ -93,6 +94,7 @@ class Game:
         self.clock = pygame.time.Clock()
 
         self.assets: AssetLoader = default_loader()
+        self.audio = default_audio()
 
         self.background = ParallaxBackground(seed=7)
         self.input = InputManager()
@@ -187,6 +189,8 @@ class Game:
 
             if self.input.consume_press("f1"):
                 self.show_overlay = not self.show_overlay
+            if self.input.consume_press("mute"):
+                self.audio.toggle_mute()
             if self.input.consume_press("f3"):
                 self.god_mode = not self.god_mode
             if self.input.consume_press("f4"):
@@ -201,6 +205,11 @@ class Game:
                     self.frame_step_request = True
 
             actions = self.menu.handle(self.input, self.scene)
+            if self.scene == "title":
+                if self.input.was_pressed("up") or self.input.was_pressed("down"):
+                    self.audio.play("move")
+                if actions:
+                    self.audio.play("select")
             for a in actions:
                 self._apply_action(a)
 
@@ -400,6 +409,7 @@ class Game:
 
     def _all_clear(self) -> None:
         self.player.score += EX_CLEAR_BONUS if self._is_ex else ALL_CLEAR_BONUS
+        self.audio.play("clear")
         self.save.submit(self.difficulty, self.player.score)
         self.save.add_clear(self.difficulty)
         self._refresh_best()
@@ -633,7 +643,7 @@ class Game:
                     self._play_story(ch.boss_intro, AFTER_PLAY)
                     return
 
-        self.player.update(dt, self.input, self.pool)
+        self.player.update(dt, self.input, self.pool, self.audio)
         for e in self.enemies:
             e.update(dt, self.pool, self.player.x, self.player.y)
         if self.boss:
@@ -663,6 +673,7 @@ class Game:
 
         if not self.player.alive and not self._death_effect_pending:
             self.death_effects.append(DeathEffect(self.player.x, self.player.y))
+            self.audio.play("death")
             self._death_effect_pending = True
         if self.player.alive:
             self._death_effect_pending = False
@@ -681,6 +692,7 @@ class Game:
             self._last_spell_index = idx
             name = self.boss.get_spell_name()
             self.hud.set_spell_announce(name, t_remaining=2.5)
+            self.audio.play("spell")
 
     def _on_boss_defeated(self) -> None:
         self.player.score += self.boss.bonus_total
@@ -697,6 +709,7 @@ class Game:
             self.items.spawn(cx + jx, cy + jy, TYPE_SCORE, 1)
         self.death_effects.append(DeathEffect(cx, cy, count=40))
         self.hit_particles.spawn(cx, cy, (255, 200, 200), count=20)
+        self.audio.play("clear")
         self.lasers.clear()
 
         if self.mode == MODE_STORY:
@@ -737,6 +750,7 @@ class Game:
                 if d2 <= (br + graze_r) ** 2:
                     if self.player.try_graze(b):
                         self.graze_rings.spawn(px, py)
+                        self.audio.play("graze")
                 if d2 <= (br + hit_r) ** 2:
                     if not self.god_mode and self.player.is_vulnerable():
                         self.player.on_hit()
@@ -761,9 +775,11 @@ class Game:
                     score = e.hit(1)
                     if score:
                         self.player.score += score
+                        self.audio.play("kill")
                         e.on_death_drop(self.items, drop_bias, self._drop_rng)
                         self.hit_particles.spawn(ex, ey, (255, 220, 120), count=8)
                     else:
+                        self.audio.play("hit")
                         self.hit_particles.spawn(b.x, b.y, (255, 200, 200), count=3)
                     self.pool.release(b)
                     del pb_list[i]
@@ -780,6 +796,7 @@ class Game:
                     score = self.boss.hit(1)
                     if score:
                         self.player.score += score
+                        self.audio.play("spell")
                         if self.boss.is_dead():
                             self._on_boss_defeated()
                             break
@@ -787,6 +804,7 @@ class Game:
                             self.hit_particles.spawn(self.boss.x, self.boss.y,
                                                      (255, 220, 120), count=16)
                     else:
+                        self.audio.play("hit")
                         self.hit_particles.spawn(b.x, b.y, (200, 220, 255), count=3)
                     self.pool.release(b)
                     del pb_list[i]
@@ -876,7 +894,8 @@ class Game:
                           difficulty=self.difficulty,
                           continue_left=self.continue_left,
                           bomb_active=self.player.is_in_bomb(),
-                          boss=self.boss)
+                          boss=self.boss,
+                          muted=self.audio.muted)
             self._draw_chapter_tag()
             if self.stage_id == 0:
                 self._draw_tutorial_hints()

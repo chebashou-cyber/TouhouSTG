@@ -44,6 +44,7 @@ python main.py
 - P：暂停 / 恢复
 - Esc：退出
 - R：Game Over 后整局重来；暂停时按 R 只重开当前这一关/一章
+- M：静音开关（HUD 右下角会显示 `MUTE`）
 - F1 调试 overlay / F2 帧步进 / F3 无敌 / F4 清屏
 
 剧情对话中：Z / Enter 继续（未打完则立刻打完），X 跳过整段。
@@ -126,6 +127,7 @@ game/
 │   │   ├── game.py           主循环 + 场景/章节状态机
 │   │   ├── input_manager.py  输入 + 缓冲 + Replay 注入
 │   │   ├── save_data.py      最高分存档 (读写失败静默降级)
+│   │   ├── audio.py          程序化音效 (代码合成 PCM, 无需音频文件)
 │   │   ├── assets.py / replay.py / rng.py
 │   ├── entities/             自机 / 敌机 / Boss / 子弹池 / 激光 / 道具 / 粒子
 │   ├── patterns/             8 种弹幕模式 + 符卡数据
@@ -180,10 +182,22 @@ bash tools/build.sh    # Linux / macOS
 ## 已知限制
 
 - 立绘是程序化几何图形，不是美术资源
-- 没有音乐 / 音效资源（`assets/sfx/` 为空时用静音占位）
+- 没有 BGM：音效是代码合成的（`src/core/audio.py`），没有音频文件；`assets/sfx/` 里放 `.ogg` 会被 `AssetLoader` 优先使用
 - Replay 只记录**单关**输入；剧情模式每章单独录一份，不能整局回放
 - Replay 依赖 RNG seed 重放：改了关卡 JSON 后旧录像会对不上
 - LUNATIC 高密度弹幕的帧率取决于机器
+
+## 音效
+
+没有音频资源，全部在 `src/core/audio.py` 里用「正弦扫频 + 指数包络」合成，
+带白噪的爆炸类走一阶低通。11 种音效：射击 / 命中 / 击破 / 擦弹 / 炸弹 / 死亡 /
+符卡宣言 / 菜单移动 / 菜单确认 / 过关 / 警告。
+
+- 采样参数跟随 `pygame.mixer.get_init()`（通常 44100Hz / 16bit / 单声道），
+  `array('h')` 裸缓冲直接塞进 `pygame.mixer.Sound(buffer=...)`
+- 同类音效有最小间隔（射击 0.075s 一次），避免混音器被打满
+- 混音器不可用（无声卡 / 服务端）时整体降级为 no-op，不影响游戏
+- `M` 键静音
 
 ## 版本与回滚
 
@@ -205,6 +219,7 @@ bash tools/build.sh    # Linux / macOS
 - **章节继承**：残机 / 炸弹 / 火力 / 分数 / 擦弹跨章保留（原先打完一关就回菜单）
 - **关卡**：新增七章主线和 8 种编队模式，Boss 符卡从 2~3 张提升到 3~6 张
 - **存档**：`save/records.json` 记录各难度最高分与全通次数，标题画面显示 BEST
+- **音效**：11 种程序化音效（代码合成，无音频文件），M 键静音
 - **修 bug**：
   - `pygame.font.SysFont` 在部分 Windows 机器上直接抛 `TypeError`，游戏起不来 —— 改为直接指定字体文件，并接入中文字体
   - pygame-ce 2.6.1 下小半径圆形被光栅化成「十字/齿轮」，弹幕看起来像小星星 —— 改为 4 倍超采样
