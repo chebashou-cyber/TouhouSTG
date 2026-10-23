@@ -833,7 +833,8 @@
               "period": 0.55,
               "start_t": 0.0
             }
-          ]
+          ],
+          "lasers": []
         }
       ]
     },
@@ -899,6 +900,21 @@
               "period": 0.55,
               "start_t": 0.0
             }
+          ],
+          "lasers": [
+            {
+              "period": 3.0,
+              "start_t": 1.6,
+              "count": 5,
+              "arc": "PI/4",
+              "angle": "aimed",
+              "width": 14,
+              "warning": 0.9,
+              "active": 1.0,
+              "fade": 0.3,
+              "length": 480,
+              "color": "red"
+            }
           ]
         },
         {
@@ -929,7 +945,8 @@
               "period": 0.09,
               "start_t": 0.0
             }
-          ]
+          ],
+          "lasers": []
         },
         {
           "no": "Final",
@@ -960,7 +977,8 @@
               "period": 0.3,
               "start_t": 0.0
             }
-          ]
+          ],
+          "lasers": []
         }
       ]
     }

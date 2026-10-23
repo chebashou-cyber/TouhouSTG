@@ -133,6 +133,76 @@ class Laser:
             pygame.draw.polygon(surf, col, pts, 0)
 
 
+class LaserEmitter:
+    """符卡用的激光发射器: 按 period 周期成组放出 count 条激光。
+
+    和子弹的 Emitter 分开写, 因为激光要往 LaserPool 里塞, 而子弹是往
+    BulletPool 里塞; 参数也不一样 (有预警时间、持续时间、宽度)。
+    """
+
+    __slots__ = ("period", "start_t", "count", "arc", "angle", "width",
+                 "warning", "active", "fade", "length", "color",
+                 "elapsed", "last_emit_t", "enabled")
+
+    def __init__(self, *, period: float = 2.0, start_t: float = 0.0,
+                 count: int = 1, arc: float = 0.0, angle=math.pi / 2,
+                 width: float = LASER_DEFAULT_WIDTH,
+                 warning: float = LASER_WARNING_TIME,
+                 active: float = LASER_ACTIVE_TIME,
+                 fade: float = LASER_FADE_TIME,
+                 length: float = LASER_DEFAULT_LENGTH,
+                 color: tuple = COLOR_LASER_ACTIVE) -> None:
+        self.period = max(0.1, float(period))
+        self.start_t = float(start_t)
+        self.count = max(1, int(count))
+        self.arc = float(arc)
+        self.angle = angle            # "aimed" 或弧度值
+        self.width = float(width)
+        self.warning = float(warning)
+        self.active = float(active)
+        self.fade = float(fade)
+        self.length = float(length)
+        self.color = color
+        self.elapsed = 0.0
+        # 让第一组激光正好落在 start_t 时刻, 而不是 start_t + period
+        self.last_emit_t = self.start_t - self.period
+        self.enabled = True
+
+    def reset(self) -> None:
+        self.elapsed = 0.0
+        self.last_emit_t = self.start_t - self.period
+        self.enabled = True
+
+    def update(self, dt: float, ox: float, oy: float, tx: float, ty: float,
+               laser_pool) -> int:
+        """到点就放一组激光; 返回本次放出的条数。"""
+        if not self.enabled:
+            return 0
+        self.elapsed += dt
+        if self.elapsed < self.start_t:
+            return 0
+        spawned = 0
+        while self.last_emit_t + self.period <= self.elapsed:
+            self.last_emit_t += self.period
+            if self.angle == "aimed":
+                base = math.atan2(ty - oy, tx - ox)
+            else:
+                base = float(self.angle)
+            if self.count == 1:
+                angles = [base]
+            else:
+                half = self.arc / 2.0
+                angles = [base - half + self.arc * i / (self.count - 1)
+                          for i in range(self.count)]
+            for a in angles:
+                laser_pool.spawn(ox, oy, a, length=self.length, width=self.width,
+                                 warning_time=self.warning,
+                                 active_time=self.active, fade_time=self.fade,
+                                 color=self.color)
+                spawned += 1
+        return spawned
+
+
 class LaserPool:
     """激光集合。性能不是瓶颈, 简单 list 维护。"""
 

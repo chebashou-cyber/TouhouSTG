@@ -112,6 +112,30 @@ def main() -> int:
         game.dialogue_box.update(LOGIC_DT)
     save(game, out_dir, "07_ex_story.png")
 
+    # 8) 符卡激光 (跳到本关 Boss 的激光符卡)
+    game = Game()
+    game.god_mode = True
+    game._start_practice(difficulty=1, stage_id=7)
+    game._title_card_t = 0.0
+    game.player.x, game.player.y = 320.0, 400.0
+    frames = 0
+    while frames < 60 * 130:
+        game._step(LOGIC_DT)
+        frames += 1
+        if game.boss is not None and game.boss.label == "Boss":
+            break
+    if game.boss is not None:
+        # 跳过入场动画: 直接摆到悬停点, 否则激光会从屏幕外打下来
+        game.boss.age = 999.0
+        game.boss.x, game.boss.y = 320.0, 140.0
+        for idx, sc in enumerate(game.boss.spellcards):
+            if sc.lasers:
+                game.boss._start_spell(idx)
+                break
+        for _ in range(140):
+            game._step(LOGIC_DT)
+        save(game, out_dir, "08_lasers.png")
+
     game._close_recorder()
     pygame.quit()
     print("\n截图完成")

@@ -46,6 +46,10 @@ class Bullet:
     split_radius: float = BULLET_HITBOX_RADIUS
     split_color: tuple = (255, 90, 90)
     split_kind: int = 0  # KIND_ENEMY=0
+    # 自机符卡差异 (敌弹用默认值)
+    damage: int = 1
+    homing_turn: float = 0.0     # 追踪角速度 (rad/s), 0 = 不追踪
+    homing_time: float = 0.0     # 追踪持续时间 (s)
 
 
 def _out_of_bounds(x: float, y: float, r: float) -> bool:
@@ -82,6 +86,9 @@ class BulletPool:
         split_radius: float = BULLET_HITBOX_RADIUS,
         split_color: tuple = (255, 90, 90),
         split_kind: int = 0,
+        damage: int = 1,
+        homing_turn: float = 0.0,
+        homing_time: float = 0.0,
     ) -> Bullet:
         b = self._free.pop() if self._free else Bullet()
         b.x = x; b.y = y; b.vx = vx; b.vy = vy
@@ -95,6 +102,9 @@ class BulletPool:
         b.split_radius = split_radius
         b.split_color = split_color
         b.split_kind = split_kind
+        b.damage = damage
+        b.homing_turn = homing_turn
+        b.homing_time = homing_time
         self._active.append(b)
         return b
 
@@ -128,10 +138,17 @@ class BulletPool:
             )
 
     # ------- update -------
-    def step(self, dt: float) -> None:
+    def step(self, dt: float, targets=None) -> None:
+        """推进一帧。
+
+        targets: 可选的追踪目标列表 (敌机 / Boss, 需有 x/y/alive)。
+                 只有 homing_turn > 0 且还在追踪时限内的子弹会转向。
+        """
         new_active: list[Bullet] = []
         for b in self._active:
             b.age += dt
+            if b.homing_turn > 0.0 and b.age <= b.homing_time and targets:
+                self._steer(b, targets, dt)
             b.vx += b.ax * dt
             b.vy += b.ay * dt
             b.x += b.vx * dt
@@ -149,6 +166,36 @@ class BulletPool:
             else:
                 new_active.append(b)
         self._active = new_active
+
+    def _steer(self, b: Bullet, targets, dt: float) -> None:
+        """把子弹速度方向朝最近的目标转 homing_turn * dt 弧度。"""
+        best = None
+        best_d2 = 1e18
+        for t in targets:
+            if getattr(t, "alive", True) is False:
+                continue
+            dx = t.x - b.x
+            dy = t.y - b.y
+            d2 = dx * dx + dy * dy
+            if d2 < best_d2:
+                best_d2 = d2
+                best = t
+        if best is None:
+            return
+        speed = math.hypot(b.vx, b.vy)
+        if speed < 1e-6:
+            return
+        cur = math.atan2(b.vy, b.vx)
+        want = math.atan2(best.y - b.y, best.x - b.x)
+        diff = math.atan2(math.sin(want - cur), math.cos(want - cur))
+        limit = b.homing_turn * dt
+        if diff > limit:
+            diff = limit
+        elif diff < -limit:
+            diff = -limit
+        a = cur + diff
+        b.vx = math.cos(a) * speed
+        b.vy = math.sin(a) * speed
 
     def release(self, b: Bullet) -> None:
         b.alive = False

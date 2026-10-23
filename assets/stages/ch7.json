@@ -750,7 +750,8 @@
               "period": 0.3,
               "start_t": 0.0
             }
-          ]
+          ],
+          "lasers": []
         },
         {
           "no": "Mid2",
@@ -782,7 +783,8 @@
               "period": 0.08,
               "start_t": 0.0
             }
-          ]
+          ],
+          "lasers": []
         }
       ]
     },
@@ -841,7 +843,8 @@
               "period": 0.46,
               "start_t": 0.0
             }
-          ]
+          ],
+          "lasers": []
         },
         {
           "no": "2",
@@ -870,7 +873,8 @@
               "period": 0.28,
               "start_t": 0.0
             }
-          ]
+          ],
+          "lasers": []
         },
         {
           "no": "3",
@@ -899,6 +903,21 @@
               "arms": 4,
               "period": 0.075,
               "start_t": 0.0
+            }
+          ],
+          "lasers": [
+            {
+              "period": 2.2,
+              "start_t": 1.0,
+              "count": 4,
+              "arc": "PI/3",
+              "angle": "aimed",
+              "width": 18,
+              "warning": 0.8,
+              "active": 1.2,
+              "fade": 0.3,
+              "length": 480,
+              "color": "purple"
             }
           ]
         },
@@ -942,7 +961,8 @@
               "period": 0.26,
               "start_t": 0.12
             }
-          ]
+          ],
+          "lasers": []
         }
       ]
     }

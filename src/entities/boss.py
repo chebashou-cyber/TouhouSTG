@@ -67,7 +67,7 @@ class Boss:
         self.label = label
 
     # ---------------- 主循环 ----------------
-    def update(self, dt: float, pool: BulletPool, player) -> None:
+    def update(self, dt: float, pool: BulletPool, player, lasers=None) -> None:
         if not self.alive:
             return
         self.age += dt
@@ -83,6 +83,9 @@ class Boss:
             self.spell_timer += dt
             for em in self.current_spell.emitters:
                 em.update(dt, self.x, self.y, player.x, player.y, pool)
+            if lasers is not None:
+                for le in self.current_spell.lasers:
+                    le.update(dt, self.x, self.y, player.x, player.y, lasers)
             # 超时 -> break
             if self.spell_timer >= self.current_spell.duration:
                 self._break_timeout()
@@ -113,11 +116,13 @@ class Boss:
         self.current_spell = self.spellcards[idx]
         self.current_spell.spell_start_hp = self.hp
         self.spell_timer = 0.0
-        # 重置每个 emitter 内部计时
+        # 重置每个 emitter / 激光发射器内部计时
         for em in self.current_spell.emitters:
             em.elapsed = 0.0
             em.last_emit_t = 0.0
             em.active = True
+        for le in self.current_spell.lasers:
+            le.reset()
         self.state = STATE_SPELL
 
     def _break_killed(self) -> int:

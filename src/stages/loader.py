@@ -48,6 +48,7 @@ import json
 import math
 from src.entities.enemy import Wave, Enemy, Emitter
 from src.entities.boss import Boss
+from src.entities.laser import LaserEmitter
 from src.patterns.spellcard import SpellCard
 from src.patterns.aimed import Aimed
 from src.patterns.fan import Fan
@@ -59,7 +60,9 @@ from src.core.rng import RNG
 from config import (
     ENEMY_DEFAULT_HP, ENEMY_DEFAULT_SCORE, ENEMY_HITBOX_RADIUS,
     BOSS_HITBOX_RADIUS, BOSS_SCORE,
-    parse_angle,
+    LASER_DEFAULT_WIDTH, LASER_DEFAULT_LENGTH,
+    LASER_WARNING_TIME, LASER_ACTIVE_TIME, LASER_FADE_TIME,
+    parse_angle, to_color,
 )
 
 
@@ -121,6 +124,30 @@ def _make_emitter(spec: dict) -> Emitter:
     return Emitter(pattern, period=period, start_t=start_t, duration=duration)
 
 
+def _make_laser_emitter(spec: dict) -> LaserEmitter:
+    """激光发射器: angle 支持 "aimed" 或 "PI/2" 这类字符串。"""
+    spec = dict(spec)
+    angle = spec.get("angle", "PI/2")
+    if isinstance(angle, str):
+        if angle != "aimed":
+            angle = parse_angle(angle)
+    if isinstance(spec.get("arc"), str):
+        spec["arc"] = parse_angle(spec["arc"])
+    return LaserEmitter(
+        period=spec.get("period", 2.0),
+        start_t=spec.get("start_t", 0.0),
+        count=spec.get("count", 1),
+        arc=spec.get("arc", 0.0),
+        angle=angle,
+        width=spec.get("width", LASER_DEFAULT_WIDTH),
+        warning=spec.get("warning", LASER_WARNING_TIME),
+        active=spec.get("active", LASER_ACTIVE_TIME),
+        fade=spec.get("fade", LASER_FADE_TIME),
+        length=spec.get("length", LASER_DEFAULT_LENGTH),
+        color=to_color(spec.get("color", "red")),
+    )
+
+
 def load_stage(path: str) -> dict:
     """读取 JSON 文件, 返回原始 dict (name / waves / bosses)。"""
     with open(path, "r", encoding="utf-8") as f:
@@ -150,6 +177,7 @@ def build_bosses(data: dict) -> list[tuple[float, Boss]]:
         spellcards = []
         for sc in bs.get("spellcards", []):
             emitters = [_make_emitter(dict(em)) for em in sc.get("emitters", [])]
+            lasers = [_make_laser_emitter(dict(ls)) for ls in sc.get("lasers", [])]
             spell = SpellCard(
                 name=sc["name"],
                 duration=sc.get("duration", 25.0),
@@ -157,6 +185,7 @@ def build_bosses(data: dict) -> list[tuple[float, Boss]]:
                 emitters=emitters,
                 bonus_score=sc.get("bonus_score", 100000),
                 no=sc.get("no", "1"),
+                lasers=lasers,
             )
             spellcards.append(spell)
         boss = Boss(

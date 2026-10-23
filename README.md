@@ -10,8 +10,10 @@ v1.0 在原有弹幕引擎之上补了**剧情模式**：六章连续闯关，�
 | 剧情对话 | 道中弹幕 |
 | --- | --- |
 | ![剧情](docs/screenshots/02_story.png) | ![道中](docs/screenshots/03_gameplay.png) |
-| **Boss 符卡** | **ALL CLEAR** |
-| ![Boss](docs/screenshots/04_boss.png) | ![结算](docs/screenshots/06_allclear.png) |
+| **Boss 符卡** | **符卡激光** |
+| ![Boss](docs/screenshots/04_boss.png) | ![激光](docs/screenshots/08_lasers.png) |
+| **ALL CLEAR** | **EX 章** |
+| ![结算](docs/screenshots/06_allclear.png) | ![EX](docs/screenshots/07_ex_story.png) |
 
 ## 运行
 
@@ -31,9 +33,19 @@ python main.py
 | START | 剧情模式：六章连续闯关，中途不退出 |
 | STAGE | 单关练习：0 教学关 / 1~7 剧情章与 EX 章 / 8~10 追加 EX 关 |
 | EXTRA | EX 章「星之残响」：本篇全通一次后解锁 |
+| SHOT | 自机符卡类型：灵符·集中 / 散符·扩散 / 追尾·诱导 |
 | DIFFICULTY | EASY / NORMAL / HARD / LUNATIC |
 | REPLAY | 播放 `replay/` 里最新的一份录像 |
 | QUIT | 退出 |
+
+三种符卡类型的区别在**弹道**而不是数值（单次齐射都是 3 发 × 1 伤害，
+所以 DPS 上限一致，平衡检查的结论对三种都成立）：
+
+| 类型 | 弹道 | 适合 |
+| --- | --- | --- |
+| 灵符·集中 | 3 发几乎重合的直线弹 | 单体输出、卡位对轴 |
+| 散符·扩散 | 3 发扇形，张角 0.44 rad | 清群、同时压制多目标 |
+| 追尾·诱导 | 3 发会拐弯的追踪弹（7 rad/s，1.2s） | 命中率最高，弹速偏慢 |
 
 游戏中按键:
 
@@ -108,6 +120,17 @@ python tools/gen_stages.py --check   # 只校验，不写文件
 
 关卡支持的弹幕模式：`aimed / fan / ring / spiral / scatter / delayed_aimed /
 delayed_fan / delayed_ring`，角度可写成 `"PI"`, `"PI/3"`, `"2*PI"` 这类字符串。
+符卡还可以带 `lasers` 数组（激光弹幕），例如：
+
+```json
+"lasers": [
+  {"period": 2.2, "start_t": 1.0, "count": 4, "arc": "PI/3",
+   "angle": "aimed", "width": 18, "warning": 0.8, "active": 1.2}
+]
+```
+
+`angle` 可以是 `"aimed"` 或弧度字符串；`count > 1` 时按 `arc` 张开。
+激光走的是独立的 `LaserPool`，有预警 → 实弹 → 淡出三段状态。
 数据结构见 [`src/stages/loader.py`](src/stages/loader.py) 顶部说明。
 
 ## 目录结构
@@ -156,7 +179,8 @@ python tools\balance_check.py  # 符卡可击破性：需求伤害 vs 时限内�
 ```
 
 `story_smoke.py` 会真的跑完整流程：自动跳过所有对话、秒杀每个 Boss，
-检查章节顺序、分数继承、存档写入、暂停「重开本章」的语义、EX 章解锁条件，
+检查章节顺序、分数继承、存档写入、暂停「重开本章」的语义、EX 章解锁条件、
+三种射击流派都能开火、追踪弹真的会拐弯、符卡激光的预警/实弹阶段，
 最后渲染 ALL CLEAR / EX CLEAR 画面；末尾还会用 LUNATIC 在 EX 关满密度跑 100 秒，
 确认弹幕数量不会失控（当前峰值约 2000 颗）。
 
@@ -227,6 +251,11 @@ bash tools/build.sh    # Linux / macOS
 - **关卡**：新增七章主线和 8 种编队模式，Boss 符卡从 2~3 张提升到 3~6 张
 - **存档**：`save/records.json` 记录各难度最高分与全通次数，标题画面显示 BEST
 - **音效**：11 种程序化音效（代码合成，无音频文件），M 键静音
+- **自机符卡**：3 种射击流派（集中 / 扩散 / 追尾），弹道不同而非纯数值堆叠
+- **激光符卡**：`LaserPool` 之前一直没被关卡用过；现在符卡可以配 `lasers`，
+  竹林 / 天守 / 终章 / EX 章的四张符卡用上了激光
+- **打击感**：Boss 击破与放炸弹时有短暂定格；击破瞬间清掉残留敌弹
+  （原先会在「赢了」的那一秒被旧弹打死）
 - **平衡护栏**：`tools/balance_check.py` 按理论 DPS 检查每张符卡能否在时限内打破
   （曾检出 EX 章终符需求 1210 伤害、时限内只有 1200，已调整）
 - **修 bug**：

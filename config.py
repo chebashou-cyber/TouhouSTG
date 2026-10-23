@@ -32,6 +32,25 @@ PLAYER_SPAWN_Y = SCREEN_H - 80
 PLAYER_MOVE_BOUND_TOP = 16
 PLAYER_MOVE_BOUND_BOTTOM = SCREEN_H - 8
 
+# -------------------- 自机符卡类型 (射击流派) --------------------
+# 三种流派单次齐射都是 3 发、每发 1 点伤害, 所以理论 DPS 上限仍是
+# 3 / PLAYER_FIRE_INTERVAL = 37.5, tools/balance_check.py 的结论对三种都成立。
+# 差别在弹道形状与命中方式, 而不是纯数值。
+SHOT_KEYS = ("focus", "spread", "homing")
+SHOT_NAMES = ("灵符·集中", "散符·扩散", "追尾·诱导")
+SHOT_DESCS = (
+    "3 发几乎重合的直线弹, 对单体最集中",
+    "3 发扇形弹, 清群效率高, 对单体偏弱",
+    "3 发会拐弯的追踪弹, 命中率最高, 弹速偏慢",
+)
+SHOT_COLORS = ((120, 255, 140), (255, 232, 130), (150, 205, 255))
+SHOT_DEFAULT = 0
+SHOT_HOMING_TURN = 7.0      # rad/s
+SHOT_HOMING_TIME = 1.2      # s
+SHOT_SPREAD_ARC = 0.44      # 散射总张角 (rad)
+SHOT_SPREAD_SPEED = 600.0
+SHOT_HOMING_SPEED = 520.0
+
 # -------------------- 炸弹 --------------------
 BOMB_INVULN_TIME = 2.0
 BOMB_CLEAR_BULLET_SCORE = 100
@@ -148,6 +167,10 @@ STAGE_TITLE_CARD_TIME = 3.4      # 关卡开场标题卡显示时长 (s)
 CHAPTER_CLEAR_BONUS = 150000     # 每章通过奖励
 ALL_CLEAR_BONUS = 1000000        # 六章全通奖励
 EX_CLEAR_BONUS = 500000          # EX 章通过奖励
+
+# -------------------- 打击感 --------------------
+BOSS_DEFEAT_FREEZE = 0.14        # Boss 击破时的定格时长 (s)
+BOMB_FREEZE = 0.08               # 放炸弹时的定格时长 (s)
 DIALOGUE_LINE_GAP = 0.0          # 台词间停顿 (s), 0 表示按键即翻
 
 # -------------------- 存档 --------------------

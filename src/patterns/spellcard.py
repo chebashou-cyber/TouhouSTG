@@ -24,6 +24,7 @@ class SpellCard:
     emitters: list  # list[Emitter]
     bonus_score: int = 100000
     no: str = "1"
+    lasers: list = field(default_factory=list)  # list[LaserEmitter]
 
     def __post_init__(self) -> None:
         # 运行时状态: 进入此符卡时的 HP 与累计击中

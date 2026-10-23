@@ -131,10 +131,18 @@ def spells(*items):
     return out
 
 
-def spell(no, name, duration, threshold, bonus, emitters):
+def spell(no, name, duration, threshold, bonus, emitters, lasers=None):
     return {"no": no, "name": name, "duration": duration,
             "hp_threshold": threshold, "bonus_score": bonus,
-            "emitters": emitters}
+            "emitters": emitters, "lasers": lasers or []}
+
+
+def laser(period=2.0, start_t=0.0, count=1, arc="0", angle="aimed",
+          width=18, warning=1.0, active=1.2, fade=0.3, length=480, color="red"):
+    """符卡激光: 每 period 秒成组放 count 条, 张角 arc, 方向 angle。"""
+    return {"period": period, "start_t": start_t, "count": count, "arc": arc,
+            "angle": angle, "width": width, "warning": warning,
+            "active": active, "fade": fade, "length": length, "color": color}
 
 
 def boss(t, x, y, hp, label, radius, path, score, spellcards):
@@ -313,6 +321,9 @@ def stage_ch3():
                 aimed("green", 300, 1, period=0.22),
                 aimed("green", 300, 1, period=0.22, start_t=0.11),
                 fan("yellow", 210, 7, "PI/3", "aimed", 0.55),
+            ], [
+                laser(period=3.0, start_t=1.6, count=5, arc="PI/4",
+                      width=14, warning=0.9, active=1.0),
             ]),
             spell("2", "迷符「回不去的路」", 26, 0.38, 500000, [
                 ring("purple", 180, 24, rotate_speed=0.25, period=0.6),
@@ -438,6 +449,9 @@ def stage_ch5():
             spell("2", "工符「不再计数之夜」", 27, 0.38, 560000, [
                 delayed_fan("purple", 250, 11, "PI/3", "aimed", 0.58, 4, 175, period=0.5),
                 spiral("yellow", 200, 2, 0.26, arms=3, period=0.09),
+            ], [
+                laser(period=2.4, start_t=1.2, count=3, arc="PI/6",
+                      width=20, warning=1.1, active=1.3, color="purple"),
             ]),
             spell("Final", "零符「第一次的愿望」", 30, 0.5, 950000, [
                 ring("red", 220, 32, rotate_speed=0.4, period=0.45),
@@ -510,6 +524,10 @@ def stage_ch6():
                 delayed_fan("purple", 260, 15, "PI/2", "aimed", 0.55, 5, 180, period=0.46),
                 ring("blue", 190, 28, rotate_speed=-0.3, period=0.55),
                 aimed("yellow", 300, 1, period=0.3, start_t=0.15),
+            ], [
+                laser(period=3.4, start_t=2.0, count=7, arc="PI",
+                      angle="PI/2", width=16, warning=1.2, active=1.0,
+                      color="yellow"),
             ]),
         )),
     ]
@@ -580,6 +598,9 @@ def stage_ch7():
             spell("3", "熄符「熄灭之前的一秒」", 28, 0.38, 820000, [
                 ring("red", 230, 34, rotate_speed=0.5, period=0.4),
                 spiral("purple", 215, 3, 0.3, arms=4, period=0.075),
+            ], [
+                laser(period=2.2, start_t=1.0, count=4, arc="PI/3",
+                      width=18, warning=0.8, active=1.2, color="purple"),
             ]),
             spell("Final", "终符「谢幕的星屑」", 32, 0.42, 1400000, [
                 delayed_fan("yellow", 270, 15, "PI/2", "aimed", 0.55, 5, 185, period=0.44),
@@ -635,6 +656,12 @@ def validate(name: str, data: dict) -> list[str]:
             for k in ("name", "duration", "hp_threshold", "emitters"):
                 if k not in sc:
                     errs.append(f"{name}: 符卡 {sc.get('name')} 缺少 {k}")
+            for j, ls in enumerate(sc.get("lasers", [])):
+                for k in ("period", "count", "angle"):
+                    if k not in ls:
+                        errs.append(f"{name}: 符卡 {sc.get('name')} 激光[{j}] 缺少 {k}")
+                if ls.get("count", 1) > 1 and "arc" not in ls:
+                    errs.append(f"{name}: 符卡 {sc.get('name')} 激光[{j}] 多根却没有 arc")
     return errs
 
 

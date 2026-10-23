@@ -26,6 +26,7 @@ from src.stages.stage_factory import STAGE_LABELS, MAX_STAGE as MAX_STAGE_ID
 from config import (
     SCREEN_W, SCREEN_H,
     DIFFICULTY_NAMES, DIFFICULTY_DEFAULT,
+    SHOT_NAMES, SHOT_DESCS, SHOT_DEFAULT,
     COLOR_MENU_DIM, COLOR_MENU_SEL, COLOR_MENU_TITLE, COLOR_MENU_ACCENT,
     COLOR_TEXT, COLOR_TEXT_DIM,
     CONTINUE_MAX,
@@ -36,10 +37,11 @@ from config import (
 TITLE_ROW_START = 0
 TITLE_ROW_STAGE = 1
 TITLE_ROW_EX = 2
-TITLE_ROW_DIFFICULTY = 3
-TITLE_ROW_REPLAY = 4
-TITLE_ROW_QUIT = 5
-TITLE_ROWS = 6
+TITLE_ROW_SHOT = 3
+TITLE_ROW_DIFFICULTY = 4
+TITLE_ROW_REPLAY = 5
+TITLE_ROW_QUIT = 6
+TITLE_ROWS = 7
 
 
 def compute_rank(lives: int, continue_used: int) -> str:
@@ -71,6 +73,7 @@ class MenuSystem:
         "_title_cursor",
         "_title_diff_cursor",
         "_title_stage_cursor",
+        "_title_shot_cursor",
         "max_stage",
     )
 
@@ -85,6 +88,7 @@ class MenuSystem:
         self._title_cursor = TITLE_ROW_START
         self._title_diff_cursor = DIFFICULTY_DEFAULT
         self._title_stage_cursor = 1
+        self._title_shot_cursor = SHOT_DEFAULT
         self.max_stage = max_stage
 
     def reset_for_title(self) -> None:
@@ -112,16 +116,25 @@ class MenuSystem:
                     self._title_stage_cursor = max(0, self._title_stage_cursor - 1)
                 if input.was_pressed("right"):
                     self._title_stage_cursor = min(self.max_stage, self._title_stage_cursor + 1)
+            elif self._title_cursor == TITLE_ROW_SHOT:
+                if input.was_pressed("left"):
+                    self._title_shot_cursor = (self._title_shot_cursor - 1) % len(SHOT_NAMES)
+                if input.was_pressed("right"):
+                    self._title_shot_cursor = (self._title_shot_cursor + 1) % len(SHOT_NAMES)
             confirmed = (input.consume_press("enter") or input.consume_press("z")
                          or input.consume_press("space"))
             if confirmed:
                 if self._title_cursor == TITLE_ROW_START:
-                    actions.append(("start_story", self._title_diff_cursor))
+                    actions.append(("start_story", self._title_diff_cursor,
+                                    self._title_shot_cursor))
                 elif self._title_cursor == TITLE_ROW_STAGE:
                     actions.append(("start_practice", self._title_diff_cursor,
-                                    self._title_stage_cursor))
+                                    self._title_stage_cursor, self._title_shot_cursor))
                 elif self._title_cursor == TITLE_ROW_EX:
-                    actions.append(("start_ex", self._title_diff_cursor))
+                    actions.append(("start_ex", self._title_diff_cursor,
+                                    self._title_shot_cursor))
+                elif self._title_cursor == TITLE_ROW_SHOT:
+                    actions.append(("set_shot", self._title_shot_cursor))
                 elif self._title_cursor == TITLE_ROW_DIFFICULTY:
                     actions.append(("set_difficulty", self._title_diff_cursor))
                 elif self._title_cursor == TITLE_ROW_REPLAY:
@@ -217,8 +230,8 @@ class MenuSystem:
             "v1.0  story campaign  /  6 chapters + EX", True, COLOR_TEXT_DIM)
         self._center(surf, ver, 100)
 
-        y0 = 138
-        dy = 38
+        y0 = 124
+        dy = 31
         cursor_x = SCREEN_W // 2 - 175
         label_x = SCREEN_W // 2 - 150
         la = self.font_med.render("<", True, COLOR_MENU_ACCENT)
@@ -226,8 +239,8 @@ class MenuSystem:
 
         def arrow(y_pos):
             pygame.draw.polygon(surf, COLOR_MENU_SEL, [
-                (cursor_x, y_pos + 8), (cursor_x + 12, y_pos + 14),
-                (cursor_x, y_pos + 20),
+                (cursor_x, y_pos + 6), (cursor_x + 12, y_pos + 12),
+                (cursor_x, y_pos + 18),
             ])
 
         def label(y_pos, text, focused, color=None):
@@ -239,7 +252,7 @@ class MenuSystem:
         def desc(y_pos, text, focused, color=None):
             c = color or (COLOR_TEXT if focused else COLOR_TEXT_DIM)
             surf.blit(self.font_cjk_small.render(text, True, c),
-                      (SCREEN_W // 2 + 26, y_pos + 8))
+                      (SCREEN_W // 2 + 26, y_pos + 7))
 
         # 0 START
         y = y0
@@ -254,11 +267,11 @@ class MenuSystem:
         sid = self._title_stage_cursor
         surf.blit(self.font_big.render(f"{sid:>2d}", True, COLOR_MENU_ACCENT),
                   (SCREEN_W // 2 + 48, y))
-        surf.blit(la, (SCREEN_W // 2 + 28, y + 6))
-        surf.blit(ra, (SCREEN_W // 2 + 84, y + 6))
+        surf.blit(la, (SCREEN_W // 2 + 28, y + 5))
+        surf.blit(ra, (SCREEN_W // 2 + 84, y + 5))
         surf.blit(self.font_cjk_small.render(
             STAGE_LABELS.get(sid, "?"), True,
-            COLOR_TEXT if f else COLOR_TEXT_DIM), (SCREEN_W // 2 + 104, y + 8))
+            COLOR_TEXT if f else COLOR_TEXT_DIM), (SCREEN_W // 2 + 104, y + 7))
 
         # 2 EX (通关本篇后解锁)
         y = y0 + dy * 2
@@ -269,29 +282,45 @@ class MenuSystem:
         else:
             label(y, "EXTRA", False, (70, 70, 85))
             surf.blit(self.font_cjk_small.render("通关本篇后解锁", True, (80, 80, 100)),
-                      (SCREEN_W // 2 + 26, y + 8))
+                      (SCREEN_W // 2 + 26, y + 7))
             if f:
                 arrow(y)
 
-        # 3 DIFFICULTY
+        # 3 SHOT (自机符卡类型)
         y = y0 + dy * 3
+        f = self._title_cursor == TITLE_ROW_SHOT
+        label(y, "SHOT", f)
+        sval = self.font_big.render(SHOT_NAMES[self._title_shot_cursor], True,
+                                    COLOR_MENU_ACCENT)
+        sx = SCREEN_W // 2 + 44
+        surf.blit(sval, (sx, y))
+        surf.blit(la, (sx - 20, y + 5))
+        surf.blit(ra, (sx + sval.get_width() + 8, y + 5))
+
+        # 4 DIFFICULTY
+        y = y0 + dy * 4
         f = self._title_cursor == TITLE_ROW_DIFFICULTY
         label(y, "DIFFICULTY", f)
         dval = self.font_big.render(DIFFICULTY_NAMES[self._title_diff_cursor],
                                     True, COLOR_MENU_ACCENT)
         surf.blit(dval, (SCREEN_W // 2 + 48, y))
-        surf.blit(la, (SCREEN_W // 2 + 28, y + 6))
-        surf.blit(ra, (SCREEN_W // 2 + 54 + dval.get_width(), y + 6))
+        surf.blit(la, (SCREEN_W // 2 + 28, y + 5))
+        surf.blit(ra, (SCREEN_W // 2 + 54 + dval.get_width(), y + 5))
 
-        # 4 REPLAY
-        y = y0 + dy * 4
+        # 5 REPLAY
+        y = y0 + dy * 5
         f = self._title_cursor == TITLE_ROW_REPLAY
         label(y, "REPLAY", f)
         desc(y, "播放最新录像", f)
 
-        # 5 QUIT
-        y = y0 + dy * 5
+        # 6 QUIT
+        y = y0 + dy * 6
         label(y, "QUIT", self._title_cursor == TITLE_ROW_QUIT)
+
+        # 当前流派的说明 (始终显示, 让玩家知道选中了哪种)
+        note = self.font_cjk_small.render(SHOT_DESCS[self._title_shot_cursor],
+                                         True, (150, 180, 210))
+        self._center(surf, note, 342)
 
         # 最高分
         best = self.font_cjk_small.render(
@@ -302,18 +331,18 @@ class MenuSystem:
         if int(self._t * 2) % 2 == 0:
             h = self.font_cjk_small.render(
                 "Enter / Z : 确认      ↑↓ 选择      ←→ 调整", True, COLOR_TEXT)
-            self._center(surf, h, 386)
+            self._center(surf, h, 384)
 
         ops = self.font_small.render(
-            "Arrows/WASD Move   Shift Focus   Z Fire   X Bomb   P Pause",
+            "Arrows/WASD Move   Shift Focus   Z Fire   X Bomb   P Pause   M Mute",
             True, COLOR_TEXT_DIM,
         )
-        self._center(surf, ops, 412)
+        self._center(surf, ops, 406)
         ops2 = self.font_small.render(
             "F1 Debug   F2 Step   F3 God   F4 Clear   Esc Quit",
             True, COLOR_TEXT_DIM,
         )
-        self._center(surf, ops2, 432)
+        self._center(surf, ops2, 426)
 
     # ---- paused ----
     def _draw_paused(self, surf):

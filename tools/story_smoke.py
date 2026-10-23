@@ -234,6 +234,107 @@ def audio_smoke():
 check("音效: 程序化生成 + 播放 + 静音开关", audio_smoke)
 
 
+# ---------------------------------------------------------------- 5c. 射击流派
+def shot_types():
+    """三种流派都能开火, 追踪弹真的会拐弯。"""
+    import math
+    from src.entities.bullet import BulletPool
+
+    game = game_mod.Game()
+    tmp = tempfile.mkdtemp(prefix="touhou-save-")
+    game.save._path = os.path.join(tmp, "records.json")
+    game.god_mode = True
+    counts = []
+    for shot in range(len(game_mod.SHOT_NAMES)):
+        game._start_practice(difficulty=1, stage_id=3, shot_type=shot)
+        assert game.player.shot_type == shot, f"流派 {shot} 未生效"
+        game.pool.clear_all()
+        game.input._held.add("z")
+        for _ in range(6):
+            game._step(LOGIC_DT)
+        game.input._held.discard("z")
+        n = sum(1 for b in game.pool.active if b.kind == 1)
+        counts.append(n)
+        assert n > 0, f"流派 {shot} 没有射出子弹"
+        assert n <= 9, f"流派 {shot} 单次齐射子弹过多: {n}"
+    print(f"     三种流派 0.1s 内自机弹数量: {counts}")
+
+    # 追踪弹转向
+    class T:
+        def __init__(self, x, y):
+            self.x, self.y, self.alive = x, y, True
+
+    pool = BulletPool(initial=8)
+    b = pool.acquire(320.0, 400.0, 0.0, -500.0, radius=3, kind=1,
+                     homing_turn=7.0, homing_time=1.2)
+    target = T(520.0, 300.0)
+    for _ in range(20):
+        pool.step(LOGIC_DT, [target])
+    ang = math.degrees(math.atan2(b.vy, b.vx))
+    assert -60.0 < ang < -10.0, f"追踪弹没有朝右上拐: {ang:.1f}°"
+    # 追踪时限过了就不再转向
+    b.age = 2.0
+    vx0, vy0 = b.vx, b.vy
+    pool.step(LOGIC_DT, [target])
+    assert abs(b.vx - vx0) < 1e-6 and abs(b.vy - vy0) < 1e-6, "超时后仍在追踪"
+    game._close_recorder()
+    print(f"     追踪弹 20 帧后角度 {ang:.1f}°, 超时后停止转向")
+
+
+check("射击流派: 三种都能开火 + 追踪弹转向", shot_types)
+
+
+# ---------------------------------------------------------------- 5d. 符卡激光
+def spell_lasers():
+    """带 lasers 的符卡真的会放出激光, 并且会按预警 -> 实弹推进状态。"""
+    from src.entities.bullet import BulletPool
+    from src.entities.laser import LaserPool, STATE_ACTIVE, STATE_WARNING
+
+    class P:
+        x, y = 320.0, 400.0
+
+    data = load_stage(stage_factory._stage_json_path(7))
+    bosses = build_bosses(data)
+    assert bosses, "stage 7 没有 boss"
+    target = None
+    for _, boss in bosses:
+        for idx, sc in enumerate(boss.spellcards):
+            if sc.lasers:
+                target = (boss, idx, sc)
+                break
+        if target:
+            break
+    assert target is not None, "stage 7 没有任何带激光的符卡"
+    boss, idx, sc = target
+    boss.age = 999.0          # 跳过入场
+    boss._start_spell(idx)
+
+    pool = BulletPool(initial=32)
+    lasers = LaserPool()
+    first = None
+    saw_warning = False
+    saw_active = False
+    for i in range(int(60 * (sc.duration))):
+        boss.update(LOGIC_DT, pool, P(), lasers)
+        lasers.update(LOGIC_DT, P())
+        if lasers.count() and first is None:
+            first = i / 60.0
+        for l in lasers._active:
+            if l.state == STATE_WARNING:
+                saw_warning = True
+            elif l.state == STATE_ACTIVE:
+                saw_active = True
+        if first is not None and saw_active:
+            break
+    assert first is not None, "激光从未生成"
+    assert saw_warning, "激光没有预警阶段"
+    assert saw_active, "激光没有进入实弹阶段"
+    print(f"     符卡「{sc.name}」首次激光 {first:.2f}s, 预警与实弹阶段都出现")
+
+
+check("符卡激光: 生成 / 预警 / 实弹", spell_lasers)
+
+
 # ---------------------------------------------------------------- 6. 暂停重开本章
 def pause_restart_chapter():
     """暂停里的 R 只能重开当前章, 不能把整局重来。"""

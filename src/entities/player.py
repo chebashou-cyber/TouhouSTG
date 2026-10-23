@@ -26,6 +26,8 @@ from config import (
     BOMB_INVULN_TIME, BOMB_CLEAR_BULLET_SCORE, BOMB_CLEAR_BULLET_SCORE_CAP, BOMB_MAX_BOMBS,
     DEATH_RESPAWN_DELAY,
     COLOR_PLAYER, COLOR_PLAYER_HITBOX, COLOR_GRAZE_RING,
+    SHOT_DEFAULT, SHOT_COLORS, SHOT_HOMING_TURN, SHOT_HOMING_TIME,
+    SHOT_SPREAD_ARC, SHOT_SPREAD_SPEED, SHOT_HOMING_SPEED,
 )
 from src.entities.bullet import BulletPool, KIND_PLAYER
 from src.core.input_manager import InputManager
@@ -41,6 +43,7 @@ class Player:
         "fire_cooldown",
         "alive", "death_timer",
         "draw_flicker_on",
+        "shot_type",
     )
 
     def __init__(self) -> None:
@@ -58,6 +61,7 @@ class Player:
         self.alive = True
         self.death_timer = 0.0
         self.draw_flicker_on = True
+        self.shot_type = SHOT_DEFAULT
 
     # ---------- 主循环 ----------
     def update(self, dt: float, input: InputManager, pool: BulletPool,
@@ -110,17 +114,48 @@ class Player:
     def _fire(self, pool: BulletPool, audio=None) -> None:
         if audio is not None:
             audio.play("shoot")
-        pool.acquire(self.x, self.y - 10,
-                     0.0, -PLAYER_FIRE_SPEED * PLAYER_BULLET_SPEED_SCALE,
-                     radius=4, color=(120, 255, 140), kind=KIND_PLAYER)
+        if self.shot_type == 2:
+            self._fire_homing(pool)
+        elif self.shot_type == 1:
+            self._fire_spread(pool)
+        else:
+            self._fire_focus(pool)
+
+    # 三种流派单次齐射都是 3 发 / 1 伤害 (power 不足时 1~2 发),
+    # 保证理论 DPS 上限一致, 差别只在弹道。
+
+    def _fire_focus(self, pool: BulletPool) -> None:
+        color = SHOT_COLORS[0]
+        speed = -PLAYER_FIRE_SPEED * PLAYER_BULLET_SPEED_SCALE
+        pool.acquire(self.x, self.y - 12, 0.0, speed,
+                     radius=4, color=color, kind=KIND_PLAYER, damage=1)
         if self.power >= 32:
-            offset_x = 8.0
-            pool.acquire(self.x - offset_x, self.y - 6,
-                         -50.0 * PLAYER_BULLET_SPEED_SCALE, -PLAYER_FIRE_SPEED * PLAYER_BULLET_SPEED_SCALE,
-                         radius=3, color=(120, 255, 140), kind=KIND_PLAYER)
-            pool.acquire(self.x + offset_x, self.y - 6,
-                         50.0, -PLAYER_FIRE_SPEED,
-                         radius=3, color=(120, 255, 140), kind=KIND_PLAYER)
+            for dx in (-5.0, 5.0):
+                pool.acquire(self.x + dx, self.y - 7, dx * 3.0, speed,
+                             radius=3, color=color, kind=KIND_PLAYER, damage=1)
+
+    def _fire_spread(self, pool: BulletPool) -> None:
+        color = SHOT_COLORS[1]
+        half = SHOT_SPREAD_ARC / 2.0
+        angles = (0.0,) if self.power < 32 else (-half, 0.0, half)
+        for a in angles:
+            pool.acquire(self.x, self.y - 8,
+                         math.sin(a) * SHOT_SPREAD_SPEED,
+                         -math.cos(a) * SHOT_SPREAD_SPEED,
+                         radius=3, color=color, kind=KIND_PLAYER, damage=1)
+
+    def _fire_homing(self, pool: BulletPool) -> None:
+        color = SHOT_COLORS[2]
+        if self.power >= 64:
+            lanes = (-9.0, 0.0, 9.0)
+        elif self.power >= 32:
+            lanes = (-6.0, 6.0)
+        else:
+            lanes = (0.0,)
+        for dx in lanes:
+            pool.acquire(self.x + dx, self.y - 8, dx * 6.0, -SHOT_HOMING_SPEED,
+                         radius=3, color=color, kind=KIND_PLAYER, damage=1,
+                         homing_turn=SHOT_HOMING_TURN, homing_time=SHOT_HOMING_TIME)
 
     # ---------- 判定 ----------
     def is_vulnerable(self) -> bool:

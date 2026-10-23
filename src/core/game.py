@@ -60,6 +60,8 @@ from config import (
     CONTINUE_MAX, CONTINUE_LIVES, CONTINUE_BOMBS, CONTINUE_POWER,
     BOSS_DEFEAT_P_DROP, BOSS_DEFEAT_SCORE_DROP, BOSS_DEFEAT_DROP_JITTER,
     STAGE_TITLE_CARD_TIME, CHAPTER_CLEAR_BONUS, ALL_CLEAR_BONUS, EX_CLEAR_BONUS,
+    BOSS_DEFEAT_FREEZE, BOMB_FREEZE,
+    SHOT_DEFAULT, SHOT_NAMES, SHOT_KEYS,
 )
 
 # ---------------- 模式 ----------------
@@ -141,6 +143,7 @@ class Game:
         self.mode = MODE_PRACTICE
         self.chapter_index = 0
         self.chapters_cleared = 0
+        self.shot_type = SHOT_DEFAULT
         self._chapters: list[Chapter] = []       # 本局要打的章节序列
         self._is_ex = False                      # 当前是否在打 EX 章
         self._carry: dict | None = None
@@ -169,6 +172,8 @@ class Game:
         self.paused = False
         self.frame_step_request = False
         self.god_mode = False
+        # 击破 / 炸弹时的短暂定格 (秒), 用来制造打击感
+        self._freeze_t = 0.0
 
         # Replay
         self.recorder: ReplayRecorder | None = None
@@ -300,7 +305,12 @@ class Game:
             return None
         return self._chapters[self.chapter_index]
 
-    def _start_story(self, difficulty: int) -> None:
+    def _set_shot(self, shot_type: int | None) -> None:
+        if shot_type is not None:
+            self.shot_type = max(0, min(len(SHOT_NAMES) - 1, int(shot_type)))
+
+    def _start_story(self, difficulty: int, shot_type: int | None = None) -> None:
+        self._set_shot(shot_type)
         if not self.campaign:
             self._start_practice(difficulty, 1)
             return
@@ -331,8 +341,9 @@ class Game:
                 and self.campaign.ex_chapter is not None
                 and self.save.total_clears() > 0)
 
-    def _start_ex(self, difficulty: int) -> None:
+    def _start_ex(self, difficulty: int, shot_type: int | None = None) -> None:
         """EX 章: 单章剧情, 打完直接 EX CLEAR, 不播本篇结局。"""
+        self._set_shot(shot_type)
         if not self._ex_unlocked():
             self._set_title_notice("先通关本篇一次，才能进入 EX 章")
             return
@@ -417,7 +428,9 @@ class Game:
         self.paused = False
         self._close_recorder()
 
-    def _start_practice(self, difficulty: int, stage_id: int) -> None:
+    def _start_practice(self, difficulty: int, stage_id: int,
+                        shot_type: int | None = None) -> None:
+        self._set_shot(shot_type)
         self.mode = MODE_PRACTICE
         self.difficulty = difficulty
         self.stage_id = max(0, min(self.MAX_STAGE, stage_id))
@@ -460,6 +473,7 @@ class Game:
 
     def _reset_player(self, carry: dict | None) -> None:
         self.player = Player()
+        self.player.shot_type = self.shot_type
         if carry:
             self.player.score = int(carry.get("score", 0))
             self.player.lives = int(carry.get("lives", PLAYER_START_LIVES))
@@ -471,26 +485,27 @@ class Game:
     def _apply_action(self, action: tuple) -> None:
         kind = action[0]
         if kind == "start_story":
-            self._start_story(difficulty=action[1])
+            self._start_story(difficulty=action[1], shot_type=action[2])
         elif kind == "start_practice":
-            self._start_practice(difficulty=action[1], stage_id=action[2])
+            self._start_practice(difficulty=action[1], stage_id=action[2],
+                                 shot_type=action[3])
         elif kind == "start_ex":
-            self._start_ex(difficulty=action[1])
+            self._start_ex(difficulty=action[1], shot_type=action[2])
         elif kind == "restart_stage":
             # 暂停里按 R: 只重开当前这一关/一章
             if self.mode == MODE_STORY:
                 self._restart_chapter()
             else:
-                self._start_practice(self.difficulty, self.stage_id)
+                self._start_practice(self.difficulty, self.stage_id, self.shot_type)
         elif kind == "restart":
             # Game Over / 结算画面按 R: 整局重来
             if self.mode == MODE_STORY:
                 if self._is_ex:
-                    self._start_ex(self.difficulty)
+                    self._start_ex(self.difficulty, self.shot_type)
                 else:
-                    self._start_story(self.difficulty)
+                    self._start_story(self.difficulty, self.shot_type)
             else:
-                self._start_practice(self.difficulty, self.stage_id)
+                self._start_practice(self.difficulty, self.stage_id, self.shot_type)
         elif kind == "continue_or_restart":
             if self.continue_left > 0:
                 self._do_continue()
@@ -505,6 +520,8 @@ class Game:
             self.scene = "title"
             self.menu.reset_for_title()
             self._refresh_best()
+        elif kind == "set_shot":
+            self._set_shot(action[1])
         elif kind == "set_difficulty":
             self.difficulty = action[1]
         elif kind == "set_stage":
@@ -605,14 +622,19 @@ class Game:
                 self.is_replaying = False
 
         if not self.paused or self.frame_step_request:
-            self._accumulator += dt
-            while self._accumulator >= LOGIC_DT:
-                self._step(LOGIC_DT)
-                self._accumulator -= LOGIC_DT
-                if self.scene != "play":
-                    # 本帧内发生了场景切换 (Boss 击破 / 剧情插入), 丢掉余量
-                    self._accumulator = 0.0
-                    break
+            if self._freeze_t > 0.0:
+                # 定格: 世界不动, 但照常渲染 (粒子/闪光继续表达「打中了」)。
+                # 注意不能提前 return, 否则录制会掉帧, replay 会错位。
+                self._freeze_t = max(0.0, self._freeze_t - dt)
+            else:
+                self._accumulator += dt
+                while self._accumulator >= LOGIC_DT:
+                    self._step(LOGIC_DT)
+                    self._accumulator -= LOGIC_DT
+                    if self.scene != "play":
+                        # 本帧内发生了场景切换 (Boss 击破 / 剧情插入), 丢掉余量
+                        self._accumulator = 0.0
+                        break
             if self.frame_step_request:
                 self.frame_step_request = False
                 self.paused = True
@@ -643,18 +665,21 @@ class Game:
                     self._play_story(ch.boss_intro, AFTER_PLAY)
                     return
 
+        bombs_before = self.player.bombs
         self.player.update(dt, self.input, self.pool, self.audio)
+        if self.player.bombs < bombs_before:
+            self._freeze_t = max(self._freeze_t, BOMB_FREEZE)
         for e in self.enemies:
             e.update(dt, self.pool, self.player.x, self.player.y)
         if self.boss:
-            self.boss.update(dt, self.pool, self.player)
+            self.boss.update(dt, self.pool, self.player, self.lasers)
             self._check_spell_announce()
             if self.boss.is_dead():
                 self._on_boss_defeated()
                 if self.scene != "play":
                     return
 
-        self.pool.step(dt)
+        self.pool.step(dt, self._homing_targets())
         laser_hits = self.lasers.update(dt, self.player)
         if laser_hits > 0 and not self.god_mode and self.player.is_vulnerable():
             self.player.on_hit()
@@ -684,6 +709,13 @@ class Game:
             self.scene = "gameover"
             self.paused = False
 
+    def _homing_targets(self) -> list:
+        """追踪弹的目标列表: 活着的敌机 + 处于可命中状态的 Boss。"""
+        out = [e for e in self.enemies if e.alive]
+        if self.boss is not None and self.boss.is_active():
+            out.append(self.boss)
+        return out
+
     def _check_spell_announce(self) -> None:
         if self.boss is None or self.boss.state != "spell":
             return
@@ -709,8 +741,11 @@ class Game:
             self.items.spawn(cx + jx, cy + jy, TYPE_SCORE, 1)
         self.death_effects.append(DeathEffect(cx, cy, count=40))
         self.hit_particles.spawn(cx, cy, (255, 200, 200), count=20)
-        self.audio.play("clear")
+        # 击破瞬间清掉残留敌弹: 否则玩家会在「赢了」的那一秒被旧弹打死
+        self.pool.clear_enemy()
         self.lasers.clear()
+        self._freeze_t = BOSS_DEFEAT_FREEZE
+        self.audio.play("clear")
 
         if self.mode == MODE_STORY:
             ch = self._current_chapter()
@@ -772,7 +807,7 @@ class Game:
                 dy = b.y - ey
                 d2 = dx * dx + dy * dy
                 if d2 <= (b.radius + er) ** 2:
-                    score = e.hit(1)
+                    score = e.hit(b.damage)
                     if score:
                         self.player.score += score
                         self.audio.play("kill")
@@ -793,7 +828,7 @@ class Game:
                 dy = b.y - self.boss.y
                 d2 = dx * dx + dy * dy
                 if d2 <= (b.radius + self.boss.radius) ** 2:
-                    score = self.boss.hit(1)
+                    score = self.boss.hit(b.damage)
                     if score:
                         self.player.score += score
                         self.audio.play("spell")
